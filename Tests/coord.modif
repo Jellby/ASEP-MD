@@ -1,0 +1,8 @@
+# --	Eliminar todas las coordenadas
+# -     Eliminar una coordenada
+# +	Añadir una coordenada
+# *     Congelar (y añadir si es necesario) una coordenada
+# a b			Distancia
+# a b c			Ángulo
+# a b c d		Diedro
+# x(a-b-c-d)+y(e-f-g-h)	Combinación lineal de coordenadas

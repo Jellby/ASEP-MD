@@ -1,0 +1,7 @@
+# Ficheros de entrada y salida
+EntradaMM = test.ctr
+
+# Parametros de la malla
+FactorMalla = 0.75  # Factor por el que se multiplican los radios de VdW
+DistMalla   = 0.5   # Distancia entre puntos, en a0
+TipoMalla   = FCC   # Tipo de red (cubica,fcc,bcc)

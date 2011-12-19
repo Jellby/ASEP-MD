@@ -1,0 +1,18 @@
+# Programa de cálculo cuántico
+ProgramaQM   = Gaussian
+EjecutableQM = scripts/gaussian_script.sh
+
+# Ficheros de entrada y salida
+EntradaMM    = test.ctr
+EntradaQM    = test.g
+SalidaQM     = test.sgau
+FChkGaussian = fchk
+
+# Parámetros del cálculo
+TipoCargas    = ESP
+FicheroCargas = cargas
+CalcHessiana  = 1
+
+# Específicos para derivadas numéricas, no quitar el # inicial
+#Derivada = 1
+#Delta = 1.0D-3 

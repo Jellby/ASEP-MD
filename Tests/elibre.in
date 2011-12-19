@@ -1,0 +1,7 @@
+ProgramaMM = Moldy
+DumpextMoldy = dumpext
+EntradaMM = test.ctr
+NumConfig = 500
+MaxIter = 10
+CorteRF = 9999
+Dielectrica = 78.0

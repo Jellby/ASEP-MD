@@ -1,0 +1,59 @@
+&SEWARD &END
+  Title
+    Testing
+  >>> coord inline basis 6-31G
+  ###(G)###
+  End of input
+  ###(C)###
+  ###(P)###
+End of input
+
+&SCF &END
+End of input
+
+*&MBPT2 &END
+*End of input
+
+*&RASSCF &END
+*  NActEl
+*    6 0 0
+*  Inactive
+*    2
+*  Ras2
+*    5
+*  OutOrbitals
+*    Canonical
+*  CIRoot
+*    2 2 1
+*  RlxRoot
+*    2
+*End of input
+
+*&CASPT2 &END
+*End of input
+
+*&MOTRA &END
+**  JobIph
+*  LumOrb
+*End of input
+
+*&CCSDT &END
+*  CCSD
+*End of input
+
+*&GUGA &END
+*  Electrons
+*    8
+*  Symmetry
+*    1
+*  Inactive
+*    4
+*  CIAll
+*    1
+*End of input
+
+*&MRCI &END
+*  SDCI
+*End of input
+
+###(F)###

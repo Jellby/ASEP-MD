@@ -1,0 +1,15 @@
+# Programa de cálculo cuántico
+ProgramaQM   = Generico
+EjecutableQM = scripts/generic-gaussian_script.sh
+
+# Ficheros de entrada y salida
+EntradaMM      = test.ctr
+EntradaQM      = test.g
+SalidaQM       = test.sgau
+FChkGaussian   = fchk
+#CargasExternas = cargas-ext
+
+# Parámetros del cálculo
+TipoCargas    = Mulliken #ESP
+FicheroCargas = cargas
+CalcHessiana  = 1

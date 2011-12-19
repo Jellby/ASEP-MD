@@ -1,0 +1,8 @@
+# Ficheros de entrada y salida
+EntradaMM = test.ctr
+
+# Parametros de la cavidad
+TipoCavidad     = Proporcional #esferica, proporcional, constante
+RadioCavidad    = 3.0 #a0 si esferica o constante, factor si proporcional
+Subdivisiones   = 3   #máximo 5
+RadioDisolvente = 1.0 #a0

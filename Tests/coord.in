@@ -1,0 +1,6 @@
+# Ficheros de entrada y salida
+EntradaMM = test.ctr
+
+# Definicion de coordenadas
+TipoCoordenadas = Internas
+AltCoordenadas = coord.modif

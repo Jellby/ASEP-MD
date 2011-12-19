@@ -1,0 +1,18 @@
+# Programa de dinámica molecular
+ProgramaMM   = Moldy
+DumpextMoldy = dumpext
+
+# Ficheros de entrada y salida
+EntradaMM = test.ctr
+
+# Parametros de la cavidad
+TipoCavidad     = Proporcional # esferica, proporcional, constante
+RadioCavidad    = 4.0          # a0 si esferica o constante, factor si proporcional
+RadioDisolvente = 3.6          # a0 (sólo para redondear las esquinas)
+
+# Parámetros del ASEP
+NumConfig = 1000 # Numero de configuraciones MM que se consideran
+
+#Parámetros del cálculo
+Dielectrica = 78.0   # Constante dieléctrica para el cálculo con "reaction field"
+CorteRF     = 9999.9 # Distancia de corte para el cálculo con "reaction field", en a0 (desactivado si > 1000)

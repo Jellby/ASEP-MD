@@ -1,0 +1,29 @@
+# Programa de cálculo cuántico
+ProgramaQM   = Generico
+EjecutableQM = scripts/generic-gaussian_script.sh
+
+# Ficheros de entrada y salida
+EntradaMM    = test.ctr
+EntradaQM    = test.g
+SalidaQM     = test.sgau
+FChkGaussian = fchk
+
+# Parametros del cálculo
+TipoCargas = ESP
+FicheroCargas = cargas
+
+# Parámetros de la optimización
+OptContinuacion = #optim.scratch
+TipoCoordenadas = Internas
+EstadoTransicion = No
+AltCoordenadas = coord.modif
+MetodoOptim = RFO
+MaxIterOpt = 40
+CalcHessiana = 0
+HessInicial = Exacta
+Actualizacion = BFGS
+BusquedaLineal = Ninguna
+#ConvGradOpt = 3.0E-4 Eh/a0
+#ConvPasoOpt = 3.0E-4 a0
+#ConvEnerOpt = 1.0E-6 Eh
+#MaxPasoOpt  = 3.0E-1 (coordenadas de trabajo)
