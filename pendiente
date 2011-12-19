@@ -64,6 +64,7 @@ General
  - Detectar cuándo no existen los ficheros (por ejemplo el fchk)
  - Continuar en cualquier punto (¿?)
  - "Diferencia de energía" cuando no empieza desde el principio
+ - Escribir errores e informaciones en cualquier fichero
 
 Resumen tipos de red:
  * Cúbica simple por defecto
