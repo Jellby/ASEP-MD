@@ -107,7 +107,7 @@ for line in file_gau:
       Q_mulliken.append(float(file_gau.next().split()[2]))
 
   # ESP charges
-  elif re.search("Charges from ESP fit", line):
+  elif re.search("Charges from ESP fit,", line):
     file_gau.next()
     file_gau.next()
     del Q_esp[:]

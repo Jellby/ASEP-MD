@@ -113,7 +113,7 @@ while (<GAU_OUTPUT>) {
     }
   }
   # ESP charges
-  if ($_ =~ /Charges from ESP fit/) {
+  if ($_ =~ /Charges from ESP fit,/) {
     $_ = <GAU_OUTPUT> for 1 .. 2;
     for (my $i=0; $i<$Q_natoms; $i++) {
       $_ = <GAU_OUTPUT>;
