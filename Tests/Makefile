@@ -2,6 +2,8 @@ include ../Makefile.cfg
 FFLAGS+= -I ..
 COMP=$(FC) $(FFLAGS)
 RMF=rm -f
+BINDIR_TESTS=../bin/tests
+BINDIR_SCRIPTS=../bin/scripts
 
 CAV=../Cavidad.o
 CONF=../Configuraciones.o
@@ -86,6 +88,12 @@ elibre: elibre.F90 $(MOLDY) $(COMUN)
 
 configs: configs.F90 $(GENMM) $(MOLDY) $(COMUN)
 	$(COMP) $^ -o $@
+
+install:
+	install -d $(BINDIR_TESTS)
+	install $(TESTS) $(BINDIR_TESTS)
+	install -d $(BINDIR_SCRIPTS)
+	install $(TESTS) $(BINDIR_SCRIPTS)
 
 clean:
 	$(RMF) $(TESTS)

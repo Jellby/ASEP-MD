@@ -1,8 +1,9 @@
 include Makefile.cfg
 
-COMP = $(FC) $(FFLAGS)
-RMF  = rm -f
-TAR  = tar -cjf
+COMP   = $(FC) $(FFLAGS)
+RMF    = rm -f
+TAR    = tar -cjf
+BINDIR = ./bin
 
 TESTS = Tests
 
@@ -60,9 +61,11 @@ CUANT  = $(GENQM_MOD) $(GAUSS_MOD) $(MOLCAS_MOD)
 
 OBJS  = $(CAV) $(COMUN) $(CONF) $(COORD) $(EJEC) $(ENT) $(GAUSS) $(GENMM) $(GENQM) $(MALLA) $(MOLCAS) $(MOLDY) $(OPTIM) $(INTER) $(UTIL) $(UTFIS)
 
+PROGS = asepmd
+
 #==============================================================================
 
-.PHONY: all tests pack clean
+.PHONY: all tests pack install clean
 
 all: $(OBJS) asepmd tests
 
@@ -165,6 +168,11 @@ pack:
 	Tests/coord.modif \
 	Tests/test.ctr Tests/test.system Tests/test.g Tests/test.input
 
+install:
+	install -d $(BINDIR)
+	install $(PROGS) $(BINDIR)
+	$(MAKE) -C $(TESTS) install
+
 clean:
-	$(RMF) *.o *.mod
+	$(RMF) *.o *.mod $(PROGS)
 	$(MAKE) -C $(TESTS) clean

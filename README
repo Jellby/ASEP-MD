@@ -1,4 +1,12 @@
-To compile, put the appropriate flags in the Makefile.cfg file. Some
-predefined, but not fully tested, cases are available. Then just run "make"
+To compile, put the appropriate flags in the Makefile.cfg file.
+Some predefined, but not fully tested, cases are available.
 
-Contact e-mail: jellby@unex.es
+Run "make" to build.
+
+Run "make install", binaries and test scripts will be placed in a directory
+named "bin".
+
+Run "make clean" to remove created files (optional).
+
+
+Contact: Ignacio Fdez. Galván (jellby@unex.es)
