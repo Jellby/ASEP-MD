@@ -93,7 +93,7 @@ install:
 	install -d $(BINDIR_TESTS)
 	install $(TESTS) $(BINDIR_TESTS)
 	install -d $(BINDIR_SCRIPTS)
-	install $(TESTS) $(BINDIR_SCRIPTS)
+	install scripts/* $(BINDIR_SCRIPTS)
 
 clean:
-	$(RMF) $(TESTS)
+	$(RMF) $(TESTS) functions.mod
