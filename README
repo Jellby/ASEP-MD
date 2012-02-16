@@ -1,4 +1,4 @@
-To compile, put the appropriate flags in the Makefile.cfg file.
+To compile, add the appropriate flags in the Makefile.cfg file.
 Some predefined, but not fully tested, cases are available.
 
 Run "make" to build.

@@ -21,6 +21,9 @@ CONF_MOD   = configuraciones.mod
 COORD      = Coordenadas.o
 COORD_MOD  = coordenadas.mod
 
+DCD        = DCD.o
+DCD_MOD    = DCD.mod
+
 EJEC       = Ejecutar.o
 EJEC_MOD   = ejecutar.mod
 
@@ -59,7 +62,7 @@ UTFIS_MOD  = utilidadesfis.mod
 
 CUANT  = $(GENQM_MOD) $(GAUSS_MOD) $(MOLCAS_MOD)
 
-OBJS  = $(CAV) $(COMUN) $(CONF) $(COORD) $(EJEC) $(ENT) $(GAUSS) $(GENMM) $(GENQM) $(MALLA) $(MOLCAS) $(MOLDY) $(OPTIM) $(INTER) $(UTIL) $(UTFIS)
+OBJS  = $(CAV) $(COMUN) $(CONF) $(COORD) $(DCD) $(EJEC) $(ENT) $(GAUSS) $(GENMM) $(GENQM) $(MALLA) $(MOLCAS) $(MOLDY) $(OPTIM) $(INTER) $(UTIL) $(UTFIS)
 
 PROGS = asepmd
 
@@ -87,6 +90,11 @@ $(CONF_MOD):  | Configuraciones.F90 cavidad.mod parametros.mod sistema.mod datos
 $(COORD):       Coordenadas.F90 unidades.mod utilidades.mod tipoatomo.mod
 	$(COMP) -c $<
 $(COORD_MOD): | Coordenadas.F90 unidades.mod utilidades.mod tipoatomo.mod
+	$(COMP) -c $(firstword $|)
+
+$(DCD):       DCD.F90 utilidades.mod
+	$(COMP) -c $<
+$(DCD_MOD): | DCD.F90 utilidades.mod
 	$(COMP) -c $(firstword $|)
 
 $(EJEC):       Ejecutar.F90 $(CUANT) genericoqm.mod gaussian.mod molcas.mod genericomm.mod moldy.mod parametros.mod sistema.mod configuraciones.mod utilidades.mod

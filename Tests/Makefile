@@ -19,8 +19,9 @@ ENT=../Entrada.o
 OPT=../Optimizacion.o $(COORD) $(ENT) $(EJEC)
 INT=../Interseccion.o $(OPT)
 MOLDY=../Moldy.o $(CONF) $(CAV) $(ENT)
+DCD=../DCD.o
 
-TESTS= eq diag inv rfo busq cargas sist calcqm dernum coord opt int cav malla calcmm cargasatom asep asepmd interp elibre configs
+TESTS= eq diag inv rfo busq cargas sist calcqm dernum coord opt int cav malla calcmm cargasatom asep asepmd interp elibre configs dcd
 
 .PHONY: all clean
 
@@ -87,6 +88,9 @@ elibre: elibre.F90 $(MOLDY) $(COMUN)
 	$(COMP) $^ -o $@
 
 configs: configs.F90 $(GENMM) $(MOLDY) $(COMUN)
+	$(COMP) $^ -o $@
+
+dcd: dcd.F90 $(DCD) $(COMUN)
 	$(COMP) $^ -o $@
 
 install:
