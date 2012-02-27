@@ -393,12 +393,14 @@ END FUNCTION Angulo
 ! Pos1,Pos2,Pos3,Pos4: Los cuatro puntos
 ! V1,V2,V3:            Vectores que forman el diedro
 ! N1,N2:               Normales de los planos
+! Aux:                 Variable auxiliar
 !-------------------------------------------------------------------------------
 FUNCTION Diedro(Pos1,Pos2,Pos3,Pos4)
   IMPLICIT NONE
   DOUBLE PRECISION :: Diedro
   DOUBLE PRECISION, DIMENSION(3), INTENT(IN) :: Pos1,Pos2,Pos3,Pos4
 
+  DOUBLE PRECISION :: Aux
   DOUBLE PRECISION, DIMENSION(3) :: V1,V2,V3,N1,N2
 
   V1(:)=Pos1(:)-Pos2(:)
@@ -409,7 +411,9 @@ FUNCTION Diedro(Pos1,Pos2,Pos3,Pos4)
   N2(:)=ProductoVect(V3(:),V2(:))
   N2(:)=N2(:)/Norma(N2(:))
   V1(:)=ProductoVect(N1(:),N2(:))
-  Diedro=SIGN(ACOS(DOT_PRODUCT(N1(:),N2(:))),DOT_PRODUCT(V1(:),V2(:)))
+  !El coseno tiene que estar en [-1,+1]
+  Aux=MIN(1.0D0,MAX(-1.0D0,DOT_PRODUCT(N1(:),N2(:))))
+  Diedro=SIGN(ACOS(Aux),DOT_PRODUCT(V1(:),V2(:)))
 
 END FUNCTION Diedro
 
