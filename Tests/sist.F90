@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -54,6 +54,11 @@ PROGRAM prueba
   CALL OrientarMolecula(Soluto,1)
   CALL OrientarMolecula(Disolvente,1)
   CALL OrientarMolecula(Disolvente2,1)
+
+  U=NuevaUnidad()
+  OPEN(U,FILE=TRIM(EntradaMM)//'.mod')
+  CALL EntradaGenericoMM(U)
+  CLOSE(U)
 
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico

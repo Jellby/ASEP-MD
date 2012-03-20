@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -166,14 +166,15 @@ MODULE Espanol
 #define LLL 256
 #endif
 
-  CHARACTER(LEN=LLL), DIMENSION(5) :: Titulo
+  CHARACTER(LEN=LLL), DIMENSION(6) :: Titulo
     DATA Titulo(1) /'========================================================='/
     DATA Titulo(2) /'|                    ASEP-MD v. 2.0                     |'/
     DATA Titulo(3) /'|                  ------------------                   |'/
-    DATA Titulo(4) /'| Copyright 2011 I.F.G., M.L.S., A.M.L., M.E.M., M.A.A. |'/
-    DATA Titulo(5) /'========================================================='/
+    DATA Titulo(4) /'| Copyright 2011,2012 I.F.G., M.L.S., A.M.L., M.E.M.,   |'/
+    DATA Titulo(5) /'|                     M.A.A.                            |'/
+    DATA Titulo(6) /'========================================================='/
 
-  CHARACTER(LEN=32), DIMENSION(43) :: Variables
+  CHARACTER(LEN=32), DIMENSION(44) :: Variables
     DATA Variables( 1) /'TipoCargas'/       !TipoCargas
     DATA Variables( 2) /'EntradaMM'/        !EntradaMM
     DATA Variables( 3) /'EntradaQM'/        !EntradaQM
@@ -217,7 +218,8 @@ MODULE Espanol
     DATA Variables(41) /'MaxIter'/          !MaxIter
     DATA Variables(42) /'InicioVacio'/      !InicioVacio
     DATA Variables(43) /'Inicio'/           !Inicio
-  CHARACTER(LEN=LLL), DIMENSION(0:39) :: Errores
+    DATA Variables(44) /'TrayectoriaMM'/    !TrayectoriaMM
+  CHARACTER(LEN=LLL), DIMENSION(0:40) :: Errores
     DATA Errores( 0) /'Error no definido.'/
     DATA Errores( 1) /'La matriz no es simetrica.'/
     DATA Errores( 2) /'Superado el numero maximo de iteraciones.'/
@@ -258,6 +260,7 @@ MODULE Espanol
     DATA Errores(37) /'Error en la definicion del sistema.'/
     DATA Errores(38) /'El MM generico requiere una sola molecula de soluto.'/
     DATA Errores(39) /'Numero incorrecto de atomos en las configuraciones.'/
+    DATA Errores(40) /'La primera iteracion no puede ser mayor que el maximo.'/
   CHARACTER(LEN=LLL), DIMENSION(40) :: Textos
     DATA Textos( 1) /'Maxima componente del gradiente:'/
     DATA Textos( 2) /'Diferencia de energia:'/
@@ -311,14 +314,15 @@ MODULE English
 #define LLL 256
 #endif
 
-  CHARACTER(LEN=LLL), DIMENSION(5) :: Titulo
+  CHARACTER(LEN=LLL), DIMENSION(6) :: Titulo
     DATA Titulo(1) /'========================================================='/
     DATA Titulo(2) /'|                    ASEP-MD v. 2.0                     |'/
     DATA Titulo(3) /'|                  ------------------                   |'/
-    DATA Titulo(4) /'| Copyright 2011 I.F.G., M.L.S., A.M.L., M.E.M., M.A.A. |'/
-    DATA Titulo(5) /'========================================================='/
+    DATA Titulo(4) /'| Copyright 2011,2012 I.F.G., M.L.S., A.M.L., M.E.M.,   |'/
+    DATA Titulo(5) /'|                     M.A.A.                            |'/
+    DATA Titulo(6) /'========================================================='/
 
-  CHARACTER(LEN=32), DIMENSION(43) :: Variables
+  CHARACTER(LEN=32), DIMENSION(44) :: Variables
     DATA Variables( 1) /'ChargesType'/     !TipoCargas
     DATA Variables( 2) /'MMInput'/         !EntradaMM
     DATA Variables( 3) /'QMInput'/         !EntradaQM
@@ -362,7 +366,8 @@ MODULE English
     DATA Variables(41) /'MaxIter'/         !MaxIter
     DATA Variables(42) /'VacuumStart'/     !InicioVacio
     DATA Variables(43) /'Start'/           !Inicio
-  CHARACTER(LEN=LLL), DIMENSION(0:39) :: Errores
+    DATA Variables(44) /'MMTrajectory'/    !TrayectoriaMM
+  CHARACTER(LEN=LLL), DIMENSION(0:40) :: Errores
     DATA Errores( 0) /'Undefined error.'/
     DATA Errores( 1) /'The matrix is not symmetric.'/
     DATA Errores( 2) /'Maximum number of iterations exceeded.'/
@@ -403,6 +408,7 @@ MODULE English
     DATA Errores(37) /'Error in the system definition.'/
     DATA Errores(38) /'Generic MM requires a single solute molecule.'/
     DATA Errores(39) /'Wrong number of atoms in configurations.'/
+    DATA Errores(40) /'The first iteration cannot be larger than the maximum.'/
   CHARACTER(LEN=LLL), DIMENSION(40) :: Textos
     DATA Textos( 1) /'Maximum component of the gradient:'/
     DATA Textos( 2) /'Energy difference:'/

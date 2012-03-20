@@ -1,8 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
-!#                                                                            #
-!# This file is part of ASEP-MD.                                              #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# ASEP-MD is free software: you can redistribute it and/or modify it under   #
 !# the terms of the GNU General Public License as published by the Free       #
@@ -49,15 +47,24 @@ PROGRAM ASEPMD
 
   CALL LeerEntrada(5)
 
-  U=NuevaUnidad()
-  OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
-  CALL LeerControlMoldy(U)
-  CLOSE(U)
+  SELECT CASE (ProgramaMM)
+   CASE (0) !Genérico
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(EntradaMM))
+    CALL LeerSistemaGenerico(U)
+    CLOSE(U)
 
-  U=NuevaUnidad()
-  OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
-  CALL LeerSistemaMoldy(U)
-  CLOSE(U)
+   CASE (1) !Moldy
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
+    CALL LeerControlMoldy(U)
+    CLOSE(U)
+
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
+    CALL LeerSistemaMoldy(U)
+    CLOSE(U)
+  END SELECT
 
   CALL OrientarMolecula(Soluto(:),0)
   CALL OrientarMolecula(Disolvente(:),0)
@@ -98,7 +105,7 @@ PROGRAM ASEPMD
 
 !>>> Lanzar la dinámica
 
-    CALL EjecutarMM
+    CALL EjecutarMM(.TRUE.)
 
     CALL Promedios(0,Soluto) !Abre el fichero UConf
     IntMD(1)=EnergiaEMM
@@ -140,6 +147,10 @@ PROGRAM ASEPMD
     CALL EscribirASEPMD()
 
   END DO
+
+!>>> Escribe el sistema final (útil para las cargas del soluto)
+  Extension='.final'
+  CALL EjecutarMM(.FALSE.)
 
 CONTAINS
 
@@ -230,6 +241,8 @@ END SUBROUTINE
 SUBROUTINE GenerarCavidad
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Esf
 
+  ! Según el tipo de cavidad, se define el número y tamaño adecuado de
+  ! las esferas que forman la cavidad
   IF (TipoCavidad == 0) THEN
     ALLOCATE(Esf(1,4))
     Esf(1,:)=(/0.0D0,0.0D0,0.0D0,RadioCavidad/)

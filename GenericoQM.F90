@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -28,7 +28,7 @@ USE DatosQM
 
 CONTAINS
 !LeerSalidaGenericoQM(Sal)
-!EntradaGenericoQM(Sal,Der)
+!EntradaGenericoQM(Sal,Der,Car)
 
 !-------------------------------------------------------------------------------
 ! Subrutina que lee una salida genérica de cálculo cuántico

@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -43,14 +43,14 @@ PROGRAM prueba
   END DO
   WRITE(6,*) 'PosConf: ',Trayectoria%PosConf
 
-!  DO i=1,Trayectoria%Natomos
-!    WRITE(6,*) Trayectoria%Coords(i,:)
-!  END DO
-
-  DO i=2,Trayectoria%Configs,3
-    CALL LeerDCD(Trayectoria,i)
-    WRITE(6,*) 'PosConf: ',Trayectoria%PosConf
+  DO i=1,Trayectoria%Natomos
+    WRITE(6,*) Trayectoria%Coords(i,:)
   END DO
+
+!  DO i=2,Trayectoria%Configs,3
+!    CALL LeerDCD(Trayectoria,i)
+!    WRITE(6,*) 'PosConf: ',Trayectoria%PosConf
+!  END DO
 
   CALL CerrarDCD(Trayectoria)
 

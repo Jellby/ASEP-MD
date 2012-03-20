@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -30,7 +30,7 @@ MODULE Parametros
 CHARACTER(LEN=LLL) :: EjecutableMM,EjecutableQM,EntradaMM,EntradaQM,SalidaQM, &
                       FChkGaussian,AltCoordenadas,FicheroCargas,Exten, &
                       Extension,OptContinuacion,CargasExternas,DumpextMoldy, &
-                      SalidaMM,SalidaOpt
+                      SalidaMM,SalidaOpt,TrayectoriaMM
 INTEGER :: ProgramaMM,ProgramaQM,TipoCargas,TipoCoordenadas,CalcHessiana, &
            Actualizacion,MetodoOptim,MaxIterOpt,HessInicial,BusquedaLineal, &
            Subdivisiones,TipoCavidad,NumConfig,TipoMalla,TipoReduccion, &
@@ -332,9 +332,7 @@ SUBROUTINE LeerVariable(Lin)
   ELSE IF (TRIM(Var) == TRIM(VarComp(21))) THEN
     VarEnt(21)=.TRUE.
     READ(Val,*) RadioCavidad
-    IF (RadioCavidad < 0.0D0) THEN
-      RadioCavidad=-RadioCavidad
-    END IF
+    IF (RadioCavidad < 0.0D0) RadioCavidad=-RadioCavidad
 
   !Subdivisiones
   ELSE IF (TRIM(Var) == TRIM(VarComp(22))) THEN
@@ -502,6 +500,11 @@ SUBROUTINE LeerVariable(Lin)
     READ(Val,*) Inicio
     IF (Inicio < 1) Inicio=1
 
+  !TrayectoriaMM
+  ELSE IF (TRIM(Var) == TRIM(VarComp(44))) THEN
+    VarEnt(44)=.TRUE.
+    TrayectoriaMM=Val
+
   !Variable inexistente
   ELSE
     CALL Mensaje('LeerVariable',8,.TRUE.)
@@ -562,6 +565,7 @@ SUBROUTINE ValoresDefecto
   IF (.NOT. VarEnt(41)) MaxIter=0
   IF (.NOT. VarEnt(42)) InicioVacio=.TRUE.
   IF (.NOT. VarEnt(43)) Inicio=1
+  IF (.NOT. VarEnt(44)) TrayectoriaMM='traj.dcd'
 
   !Algunos valores dependen de otros, pero sólo si no están en la entrada
   IF (EstadoTransicion) THEN
@@ -597,6 +601,10 @@ SUBROUTINE ValoresDefecto
 
   IF (ProgramaQM == 2) THEN
     IF (TipoCargas == 1) CALL Mensaje('ValoresDefecto',29,.TRUE.)
+  END IF
+
+  IF (MaxIter < Inicio) THEN
+    CALL Mensaje('ValoresDefecto',29,.TRUE.)
   END IF
 
 END SUBROUTINE ValoresDefecto

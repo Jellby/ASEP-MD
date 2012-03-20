@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -19,9 +19,12 @@
 !##############################################################################
 
 MODULE GenericoMM
+USE DCD
 
 CONTAINS
 !LeerSistemaGenerico(Fich)
+!LeerConfigsGenerico()
+!EntradaGenericoMM(Sal)
 
 !-------------------------------------------------------------------------------
 ! Esta subrutina lee los datos del sistema en un formato específico
@@ -175,6 +178,156 @@ END SUBROUTINE LeerSistemaGenerico
 SUBROUTINE LeerConfigsGenerico
   USE Configuraciones
   USE Parametros
+  USE Sistema
+  USE Unidades
+  USE Utilidades
+  USE UtilidadesFis
+  USE TipoAtomo
+  IMPLICIT NONE
+  TYPE(TipoDCD) :: Tray
+  TYPE(Atomo), DIMENSION(:), ALLOCATABLE :: SolConf
+  DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Pos
+  DOUBLE PRECISION, DIMENSION(7) :: Mover
+  DOUBLE PRECISION :: Paso
+  INTEGER :: Num,Conf,i,j,k
+
+  Num=0
+  Num=Num+MoleculasSoluto*SIZE(Soluto,1)
+  Num=Num+MoleculasDisolvente*SIZE(Disolvente,1)
+  Num=Num+MoleculasDisolvente2*SIZE(Disolvente2,1)
+
+  Tray%Nombre=TRIM(TrayectoriaMM)
+  CALL AbrirDCD(Tray)
+  IF (Tray%NAtomos /= Num) CALL Mensaje('LeerConfigsGenerico',39,.TRUE.)
+
+  ALLOCATE(SolConf(SIZE(Soluto,1)),Pos(Num,3))
+  SolConf(:)=Soluto(:)
+
+  CALL AbrirUConf()
+
+  Paso=DBLE(Tray%Configs-1)/DBLE(NumConfig-1)
+  DO i=1,NumConfig
+    Conf=NINT((i-1)*Paso+1)
+    CALL LeerDCD(Tray,Conf)
+    Pos(:,:)=Tray%Coords(:,:)*AngstromAtomica
+
+    DO j=1,SIZE(Soluto,1)
+      SolConf(j)%pos(:)=Pos(j,:)
+    END DO
+    CALL SuperponerMoleculas(Soluto,SolConf,Trans=Mover)
+    Pos(:,:)=RotarCuaternion(Pos(:,:),Mover(1:4))
+    Pos(:,:)=Pos(:,:)+SPREAD(Mover(5:7),DIM=1,NCOPIES=Num)
+
+    !Se escribe la configuracion en el fichero binario
+    WRITE(UConf) Conf
+    WRITE(UConf) 0
+    WRITE(UConf) (/0.0D0,0.0D0,0.0D0,0.0D0,0.0D0,0.0D0,0.0D0,0.0D0,0.0D0/)
+    WRITE(UConf) (/0.0D0,0.0D0,0.0D0/)
+    WRITE(UConf) (/1.0D0,0.0D0,0.0D0,0.0D0/)
+    k=1
+    DO j=1,MoleculasSoluto
+      WRITE(UConf) 0.0D0
+      WRITE(UConf) (/0.0D0,0.0D0,0.0D0/)
+      WRITE(UConf) (/1.0D0,0.0D0,0.0D0,0.0D0/)
+      WRITE(UConf) Pos(k:k+SIZE(Soluto,1)-1,:)
+      k=k+SIZE(Soluto,1)
+    END DO
+    DO j=1,MoleculasDisolvente
+      WRITE(UConf) 0.0D0
+      WRITE(UConf) (/0.0D0,0.0D0,0.0D0/)
+      WRITE(UConf) (/1.0D0,0.0D0,0.0D0,0.0D0/)
+      WRITE(UConf) Pos(k:k+SIZE(Disolvente,1)-1,:)
+      k=k+SIZE(Disolvente,1)
+    END DO
+    DO j=1,MoleculasDisolvente2
+      WRITE(UConf) 0.0D0
+      WRITE(UConf) (/0.0D0,0.0D0,0.0D0/)
+      WRITE(UConf) (/1.0D0,0.0D0,0.0D0,0.0D0/)
+      WRITE(UConf) Pos(k:k+SIZE(Disolvente2,1)-1,:)
+      k=k+SIZE(Disolvente2,1)
+    END DO
+  END DO
+
+  CALL CerrarDCD(Tray)
+
+  DEALLOCATE(SolConf,Pos)
+
+END SUBROUTINE LeerConfigsGenerico
+
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+SUBROUTINE EntradaGenericoMM(Sal)
+  USE Sistema
+  USE Unidades
+  IMPLICIT NONE
+  INTEGER, INTENT(IN) :: Sal
+
+  INTEGER :: i,j,Num
+
+  Num=0
+  Num=Num+MoleculasDisolvente*SIZE(Disolvente,1)
+  Num=Num+MoleculasDisolvente2*SIZE(Disolvente2,1)
+
+  WRITE(Sal,'(A)') 'Solute'
+  WRITE(Sal,100) TRIM(NombreSoluto)
+  WRITE(Sal,101) MoleculasSoluto
+  WRITE(Sal,101) SIZE(Soluto,1)
+  DO i=1,SIZE(Soluto,1)
+    WRITE(Sal,102) Soluto(i)%id,Soluto(i)%nom,Soluto(i)%z, &
+                   Soluto(i)%m/AmuAtomica,Soluto(i)%pos(:)/AngstromAtomica, &
+                   Soluto(i)%q
+  END DO
+
+  WRITE(Sal,*)
+  WRITE(Sal,'(A)') 'Solvent'
+  WRITE(Sal,101) Num
+  DO i=1,MoleculasDisolvente
+    DO j=1,SIZE(Disolvente,1)
+      WRITE(Sal,103) Disolvente(j)%id,Disolvente(j)%nom,Disolvente(j)%q
+    END DO
+  END DO
+  DO i=1,MoleculasDisolvente2
+    DO j=1,SIZE(Disolvente2,1)
+      WRITE(Sal,103) Disolvente2(j)%id,Disolvente2(j)%nom,Disolvente2(j)%q
+    END DO
+  END DO
+
+  WRITE(Sal,*)
+  WRITE(Sal,'(A)') 'Non-Bonded'
+  SELECT CASE (TipoPotencial)
+   CASE (1)
+    WRITE(Sal,100) 'lennard-jones'
+   CASE (2)
+    WRITE(Sal,100) 'generic'
+  END SELECT
+  Num=0
+  DO i=1,SIZE(QInter,1)
+    DO j=i,SIZE(QInter,2)
+      IF (QInter(i,j)) Num=Num+1
+    END DO
+  END DO
+  WRITE(Sal,101) Num
+  DO i=1,SIZE(QInter,1)
+    DO j=i,SIZE(QInter,2)
+      IF (QInter(i,j)) WRITE(Sal,104) i,j,InterAtom(i,j,:)
+    END DO
+  END DO
+
+100 FORMAT(2X,A)
+101 FORMAT(I10)
+102 FORMAT(2X,I4,1X,A16,1X,I3,1X,F6.2,4(1X,F12.6))
+103 FORMAT(2X,I4,1X,A16,1X,F12.6)
+104 FORMAT(2X,I4,1X,I4,7(1X,F14.10))
+
+END SUBROUTINE EntradaGenericoMM
+
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+SUBROUTINE LeerConfigsGenerico_Borrar
+  USE Configuraciones
+  USE Parametros
   USE Unidades
   USE Utilidades
   USE UtilidadesFis
@@ -274,6 +427,6 @@ SUBROUTINE LeerConfigsGenerico
 
   DEALLOCATE(Pos,SolConf)
 
-END SUBROUTINE LeerConfigsGenerico
+END SUBROUTINE LeerConfigsGenerico_Borrar
 
 END MODULE GenericoMM

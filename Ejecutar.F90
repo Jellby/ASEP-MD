@@ -36,7 +36,7 @@ USE Moldy
 
 CONTAINS
 !EjecutarQM(Der)
-!EjecutarMM
+!EjecutarMM(Ejec)
 
 !-------------------------------------------------------------------------------
 ! Ejecuta el programa de cálculo cuántico y lee los resultados
@@ -162,11 +162,12 @@ END SUBROUTINE EjecutarQM
 ! NumCuat:      Número de moléculas poliatómicas
 ! UEnt,USal:    Unidades de los ficheros
 !-------------------------------------------------------------------------------
-SUBROUTINE EjecutarMM
+SUBROUTINE EjecutarMM(Ejec)
   USE Parametros
   USE Sistema
   USE Utilidades
   IMPLICIT NONE
+  LOGICAL, INTENT(IN) :: Ejec
 
   CHARACTER(LEN=LLL) :: Linea,Ent,Sal,Dump
   INTEGER :: UEnt,USal,NumMol,NumCuat
@@ -188,6 +189,8 @@ SUBROUTINE EjecutarMM
     CLOSE(UEnt)
     CLOSE(USal)
   END SELECT
+
+  IF (.NOT. Ejec) RETURN
 
   Linea=TRIM(EjecutableMM)//' '//TRIM(Ent)//' '//TRIM(Sal)// &
         ' '//TRIM(Extension)
