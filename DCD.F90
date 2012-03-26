@@ -136,8 +136,8 @@ SUBROUTINE AbrirDCD(Tray)
   !configuración y se actualizan las posiciones
   IF (Tray%Cristal) READ(U)
   READ(U) Tray%Coords(:,1)
-  READ(U) Tray%Coords(:,3)
   READ(U) Tray%Coords(:,2)
+  READ(U) Tray%Coords(:,3)
   Tray%Posicion=1
   Tray%PosConf=Tray%Posicion
 

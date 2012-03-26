@@ -128,8 +128,8 @@ SUBROUTINE LeerConfig(Error)
   READ(UConf)
   READ(UConf)
 
-  !Se calcula el radio de corte
-  IF (Centro > 0) THEN
+  !Se calcula el radio de corte (si se usa Moldy)
+  IF ((Centro > 0) .AND. (ProgramaMM == 1)) THEN
     Corte=0.5D0*MIN(DefCelda(1,1),DefCelda(2,2),DefCelda(3,3))
    ELSE
     Corte=HUGE(Corte)
@@ -150,8 +150,8 @@ SUBROUTINE LeerConfig(Error)
     READ(UConf) Coords(Num+1:Num+j,:)
     IF (Dist > Corte) CYCLE
     MolSol(i)=Num
-    !Si el MM es genérico, se establece el corte por átomos
-    IF (ProgramaMM == 0) THEN
+    !Si el MM no es Moldy, se establece el corte por átomos
+    IF (ProgramaMM /= 1) THEN
       DO k=Num+1,Num+j
         IF (DOT_PRODUCT(Coords(k,:),Coords(k,:)) > Corte*Corte) Fuera(k)=.TRUE.
       END DO
@@ -168,7 +168,7 @@ SUBROUTINE LeerConfig(Error)
     READ(UConf) Coords(Num+1:Num+j,:)
     IF (Dist > Corte) CYCLE
     MolDis(i)=Num
-    IF (ProgramaMM == 0) THEN
+    IF (ProgramaMM /= 1) THEN
       DO k=Num+1,Num+j
         IF (DOT_PRODUCT(Coords(k,:),Coords(k,:)) > Corte*Corte) Fuera(k)=.TRUE.
       END DO
@@ -185,7 +185,7 @@ SUBROUTINE LeerConfig(Error)
     READ(UConf) Coords(Num+1:Num+j,:)
     IF (Dist > Corte) CYCLE
     MolDis2(i)=Num
-    IF (ProgramaMM == 0) THEN
+    IF (ProgramaMM /= 1) THEN
       DO k=Num+1,Num+j
         IF (DOT_PRODUCT(Coords(k,:),Coords(k,:)) > Corte*Corte) Fuera(k)=.TRUE.
       END DO
@@ -774,6 +774,7 @@ END SUBROUTINE PotencialMM
 ! U:         Unidad donde se escriben las cargas
 ! NumCargas: Número acumulativo de cargas escritas en U
 ! Num:       Número de átomos
+! Aux:       Vector con las coordenadas de un átomo
 ! i,j:       Contadores
 !-------------------------------------------------------------------------------
 SUBROUTINE SeleccionarMols(U,NumCargas)
@@ -783,6 +784,7 @@ SUBROUTINE SeleccionarMols(U,NumCargas)
   INTEGER, INTENT(IN) :: U
   INTEGER, INTENT(INOUT) :: NumCargas
 
+  DOUBLE PRECISION, DIMENSION(3) :: Aux
   INTEGER :: Num,i,j
 
   Num=0
@@ -790,8 +792,10 @@ SUBROUTINE SeleccionarMols(U,NumCargas)
     IF ((Num+i == Centro) .OR. (MolSol(i) < 0)) CYCLE
     IF (.NOT. Interior(CentroMasa(Num+i,:))) CYCLE
     DO j=1,SIZE(Soluto,1)
-      IF (Fuera(MolSol(i)+j)) CYCLE
-      WRITE(U) Coords(MolSol(i)+j,:),Soluto(j)%q
+      !IF (Fuera(MolSol(i)+j)) CYCLE
+      Aux(:)=Coords(MolSol(i)+j,:)
+      IF (.NOT. Interior(Aux(:))) CYCLE
+      WRITE(U) Aux(:),Soluto(j)%q
       NumCargas=NumCargas+1
     END DO
   END DO
@@ -800,8 +804,10 @@ SUBROUTINE SeleccionarMols(U,NumCargas)
     IF ((Num+i == Centro) .OR. (MolDis(i) < 0)) CYCLE
     IF (.NOT. Interior(CentroMasa(Num+i,:))) CYCLE
     DO j=1,SIZE(Disolvente,1)
-      IF (Fuera(MolDis(i)+j)) CYCLE
-      WRITE(U) Coords(MolDis(i)+j,:),Disolvente(j)%q
+      !IF (Fuera(MolDis(i)+j)) CYCLE
+      Aux(:)=Coords(MolDis(i)+j,:)
+      IF (.NOT. Interior(Aux(:))) CYCLE
+      WRITE(U) Aux(:),Disolvente(j)%q
       NumCargas=NumCargas+1
     END DO
   END DO
@@ -810,8 +816,10 @@ SUBROUTINE SeleccionarMols(U,NumCargas)
     IF ((Num+i == Centro) .OR. (MolDis2(i) < 0)) CYCLE
     IF (.NOT. Interior(CentroMasa(Num+i,:))) CYCLE
     DO j=1,SIZE(Disolvente2,1)
-      IF (Fuera(MolDis2(i)+j)) CYCLE
-      WRITE(U) Coords(MolDis2(i)+j,:),Disolvente2(j)%q
+      !IF (Fuera(MolDis2(i)+j)) CYCLE
+      Aux(:)=Coords(MolDis2(i)+j,:)
+      IF (.NOT. Interior(Aux(:))) CYCLE
+      WRITE(U) Aux(:),Disolvente2(j)%q
       NumCargas=NumCargas+1
     END DO
   END DO

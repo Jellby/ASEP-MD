@@ -604,7 +604,7 @@ SUBROUTINE ValoresDefecto
   END IF
 
   IF (MaxIter < Inicio) THEN
-    CALL Mensaje('ValoresDefecto',29,.TRUE.)
+    CALL Mensaje('ValoresDefecto',40,.TRUE.)
   END IF
 
 END SUBROUTINE ValoresDefecto

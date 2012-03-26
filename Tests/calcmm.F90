@@ -69,7 +69,7 @@ PROGRAM prueba
 
   Extension='.mod'
 
-  CALL EjecutarMM
+  CALL EjecutarMM(.TRUE.)
 
   U=NuevaUnidad()
   OPEN(U,FILE='configs.xyz')

@@ -71,7 +71,7 @@ PROGRAM prueba
   CALL ConstruirCavidad(Esf(:,1:3),Esf(:,4),RadioDisolvente)
 
   Extension='.mod'
-  CALL EjecutarMM
+  CALL EjecutarMM(.TRUE.)
 
   CALL MallaMolecula(Soluto,MallaSoluto)
 

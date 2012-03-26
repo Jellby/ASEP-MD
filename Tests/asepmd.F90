@@ -96,7 +96,7 @@ PROGRAM ASEPMD
 
 !>>> Lanzar la dinámica
 
-    CALL EjecutarMM
+    CALL EjecutarMM(.TRUE.)
 
     CALL Promedios(0,Soluto) !Abre el fichero UConf
     IntMD(1)=EnergiaEMM

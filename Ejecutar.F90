@@ -179,6 +179,10 @@ SUBROUTINE EjecutarMM(Ejec)
   !Se construye la entrada para la dinámica molecular
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico
+    USal=NuevaUnidad()
+    OPEN(USal,FILE=TRIM(Ent),STATUS='REPLACE',ACTION='WRITE')
+    CALL EntradaGenericoMM(USal)
+    CLOSE(USal)
 
    CASE (1) !Moldy
     UEnt=NuevaUnidad()

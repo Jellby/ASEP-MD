@@ -220,7 +220,7 @@ SUBROUTINE LeerConfigsGenerico
 
     !Se escribe la configuracion en el fichero binario
     WRITE(UConf) Conf
-    WRITE(UConf) 0
+    WRITE(UConf) 1
     WRITE(UConf) (/0.0D0,0.0D0,0.0D0,0.0D0,0.0D0,0.0D0,0.0D0,0.0D0,0.0D0/)
     WRITE(UConf) (/0.0D0,0.0D0,0.0D0/)
     WRITE(UConf) (/1.0D0,0.0D0,0.0D0,0.0D0/)

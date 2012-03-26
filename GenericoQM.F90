@@ -164,8 +164,8 @@ SUBROUTINE LeerSalidaGenericoQM(Sal)
     CLOSE(UCar)
   END IF
 
-  !Se igualan las cargas equivalentes
-  CALL IgualarCargas(MolQM(:)%id,MolQM(:)%q)
+  !Se igualan las cargas equivalentes para el Moldy
+  IF (ProgramaMM == 1) CALL IgualarCargas(MolQM(:)%id,MolQM(:)%q)
 
 END SUBROUTINE LeerSalidaGenericoQM
 

@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -292,8 +292,8 @@ SUBROUTINE LeerSalidaMolcas(Sal)
     CLOSE(UCar)
   END IF
 
-  !Se igualan las cargas equivalentes
-  CALL IgualarCargas(MolQM(:)%id,MolQM(:)%q)
+  !Se igualan las cargas equivalentes para el Moldy
+  IF (ProgramaMM == 1) CALL IgualarCargas(MolQM(:)%id,MolQM(:)%q)
 
 100 FORMAT(3(17X,F10.4))
 

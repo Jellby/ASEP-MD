@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -311,7 +311,7 @@ END SUBROUTINE PotencialCargas
 ! Ref:             Molécula de referencia
 ! Mol:             Molécula que se superpone sobre la referencia
 ! Pesos:           Pesos relativos para considerar sólo parte de las moléculas
-! Tran:            Transformación necesaria: cuaternión, desplazamiento
+! Trans:           Transformación necesaria: cuaternión, desplazamiento
 ! MRef:            Molécula de referencia centrada
 ! W:               Pesos reales que se usan en el cálculo
 ! Coords:          Coordenadas de la molécula que se mueve
