@@ -197,7 +197,7 @@ SUBROUTINE EjecutarMM(Ejec)
   IF (.NOT. Ejec) RETURN
 
   Linea=TRIM(EjecutableMM)//' '//TRIM(Ent)//' '//TRIM(Sal)// &
-        ' '//TRIM(Extension)
+        ' '//TRIM(Extension)//' '//TRIM(TrayectoriaMM)
   CALL SYSTEM(TRIM(Linea))
 
   !Se calcula el número de moléculas y de cuaterniones

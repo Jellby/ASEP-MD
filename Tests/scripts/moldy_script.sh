@@ -3,6 +3,7 @@
 # $1: input name
 # $2: output name
 # $3: bare extension
+# $4: DCD trajectory file (unused)
 
 if [ $3 == "skip" ]; then
   exit
