@@ -244,8 +244,8 @@ SUBROUTINE LeerDCD(Tray,Pos)
   IF (Tray%NFijos == 0) THEN
     !Si no hay átomos fijos, se leen todas las coordenadas
     READ(U) Tray%Coords(:,1)
-    READ(U) Tray%Coords(:,3)
     READ(U) Tray%Coords(:,2)
+    READ(U) Tray%Coords(:,3)
    ELSE
     !Si hay átomos fijos, se leen sólo las coordenadas de los átomos móviles
     ALLOCATE(X(Tray%NLibres),Y(Tray%NLibres),Z(Tray%NLibres))
