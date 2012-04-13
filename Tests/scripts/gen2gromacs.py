@@ -11,6 +11,8 @@
 
 import sys
 import re
+import math
+import copy
 
 #=============================
 # Get input arguments
@@ -41,6 +43,126 @@ except IndexError:
   sys.exit("Missing output file")
 
 #=============================
+# Function to superpose molecules
+# see:   Acta Chrystallogr. Sec. A 61 (2005), 478
+#        J. Comput. Chem. 31 (2010), 1561
+
+def superpose ( mol1, mol2 ):
+
+  center1 = { "x": 0.0, "y": 0.0, "z": 0.0 }
+  for i in range(len(mol1)):
+    center1["x"] += mol1[i]["x"]
+    center1["y"] += mol1[i]["y"]
+    center1["z"] += mol1[i]["z"]
+  center1["x"] = center1["x"]/len(mol1)
+  center1["y"] = center1["y"]/len(mol1)
+  center1["z"] = center1["z"]/len(mol1)
+  for i in range(len(mol1)):
+    mol1[i]["x"] -= center1["x"]
+    mol1[i]["y"] -= center1["y"]
+    mol1[i]["z"] -= center1["z"]
+
+  G1 = 0
+  for i in range(len(mol1)):
+    G1 += mol1[i]["x"]**2+mol1[i]["y"]**2+mol1[i]["z"]**2
+
+  center2 = { "x": 0.0, "y": 0.0, "z": 0.0 }
+  for i in range(len(mol2)):
+    center2["x"] += mol2[i]["x"]
+    center2["y"] += mol2[i]["y"]
+    center2["z"] += mol2[i]["z"]
+  center2["x"] = center2["x"]/len(mol2)
+  center2["y"] = center2["y"]/len(mol2)
+  center2["z"] = center2["z"]/len(mol2)
+  for i in range(len(mol2)):
+    mol2[i]["x"] -= center2["x"]
+    mol2[i]["y"] -= center2["y"]
+    mol2[i]["z"] -= center2["z"]
+
+  G2 = 0
+  for i in range(len(mol2)):
+    G2 += mol2[i]["x"]**2+mol2[i]["y"]**2+mol2[i]["z"]**2
+
+  M = {}
+  for i in ["x", "y", "z"]:
+    for j in ["x", "y", "z"]:
+      M[i+j] = 0
+      for k in range(len(mol1)):
+        M[i+j] += mol1[k][i] * mol2[k][j]
+
+  K = []
+  K.append( [ M["xx"]+M["yy"]+M["zz"], M["yz"]-M["zy"], M["zx"]-M["xz"], M["xy"]-M["yx"] ] )
+  K.append( [ M["yz"]-M["zy"], M["xx"]-M["yy"]-M["zz"], M["xy"]+M["yx"], M["xz"]+M["zx"] ] )
+  K.append( [ M["zx"]-M["xz"], M["xy"]+M["yx"], M["yy"]-M["xx"]-M["zz"], M["yz"]+M["zy"] ] )
+  K.append( [ M["xy"]-M["yx"], M["xz"]+M["yz"], M["yz"]+M["zy"], M["zz"]-M["xx"]-M["yy"] ] )
+
+  coef = []
+  D = (M["xy"]**2+M["xz"]**2-M["yx"]**2-M["zx"]**2)**2
+  E = (-M["xx"]**2+M["yy"]**2+M["zz"]**2+M["yz"]**2+M["zy"]**2-2*(M["yy"]*M["zz"]-M["yz"]*M["zy"]))*\
+      (-M["xx"]**2+M["yy"]**2+M["zz"]**2+M["yz"]**2+M["zy"]**2+2*(M["yy"]*M["zz"]-M["yz"]*M["zy"]))
+  F = (-(M["xz"]+M["zx"])*(M["yz"]-M["zy"])+(M["xy"]-M["yx"])*(M["xx"]-M["yy"]-M["zz"]))*\
+      (-(M["xz"]-M["zx"])*(M["yz"]+M["zy"])+(M["xy"]-M["yx"])*(M["xx"]-M["yy"]+M["zz"]))
+  G = (-(M["xz"]+M["zx"])*(M["yz"]+M["zy"])-(M["xy"]+M["yx"])*(M["xx"]+M["yy"]-M["zz"]))*\
+      (-(M["xz"]-M["zx"])*(M["yz"]-M["zy"])-(M["xy"]+M["yx"])*(M["xx"]+M["yy"]+M["zz"]))
+  H = ( (M["xy"]+M["yx"])*(M["yz"]+M["zy"])+(M["xz"]+M["zx"])*(M["xx"]-M["yy"]+M["zz"]))*\
+      (-(M["xy"]-M["yx"])*(M["yz"]-M["zy"])+(M["xz"]+M["zx"])*(M["xx"]+M["yy"]+M["zz"]))
+  I = ( (M["xy"]+M["yx"])*(M["yz"]-M["zy"])+(M["xz"]-M["zx"])*(M["xx"]-M["yy"]-M["zz"]))*\
+      (-(M["xy"]-M["yx"])*(M["yz"]+M["zy"])+(M["xz"]-M["zx"])*(M["xx"]+M["yy"]-M["zz"]))
+  coef.append( D+E+F+G+H+I )
+  coef.append( -8.0*( M["xx"]*M["yy"]*M["zz"]+M["xy"]*M["yz"]*M["zx"]+M["xz"]*M["yx"]*M["zy"]
+                     -M["xx"]*M["yz"]*M["zy"]-M["xy"]*M["yx"]*M["zz"]-M["xz"]*M["yy"]*M["zx"] ) )
+  coef.append( -2.0*( M["xx"]**2+M["xy"]**2+M["xz"]**2+M["yx"]**2+M["yy"]**2+M["yz"]**2+M["zx"]**2+M["zy"]**2+M["zz"]**2 ) )
+  coef.append( 0.0 )
+  coef.append( 1.0 )
+  
+  root_old = 0.0
+  root = 0.5*(G1+G2)
+  while (math.fabs(root-root_old) > 1.0e-6):
+    root_old = root
+    P = root**4+coef[2]*root**2+coef[1]*root+coef[0]
+    dP = 4*root**3+2*coef[2]*root+coef[1]
+    root -= P/dP
+
+  for i in range(len(K)):
+    K[i][i] -= root
+
+  for i in range(len(K)):
+    vect = []
+    for j in range(len(K)):
+      adj = copy.deepcopy(K)
+      del adj[i]
+      for k in range(len(adj)):
+        del adj[k][j]
+      det = adj[0][0]*adj[1][1]*adj[2][2]+adj[0][1]*adj[1][2]*adj[2][0]+adj[0][2]*adj[1][0]*adj[2][1] \
+           -adj[0][0]*adj[1][2]*adj[2][1]-adj[0][1]*adj[1][0]*adj[2][2]-adj[0][2]*adj[1][1]*adj[2][0]
+      vect.append(det)
+    norm = math.sqrt(vect[0]**2+vect[1]**2+vect[2]**2+vect[3]**2)
+    if (norm > 1.0e-6):
+      vect[0] = vect[0]/norm
+      vect[1] = vect[1]/norm
+      vect[2] = vect[2]/norm
+      vect[3] = vect[3]/norm
+      break
+
+  M["xx"] =vect[0]**2+vect[1]**2-vect[2]**2-vect[3]**2
+  M["yy"] =vect[0]**2-vect[1]**2+vect[2]**2-vect[3]**2
+  M["zz"] =vect[0]**2-vect[1]**2-vect[2]**2+vect[3]**2
+  M["xy"] =2.0*(vect[1]*vect[2]-vect[0]*vect[3])
+  M["yx"] =2.0*(vect[1]*vect[2]+vect[0]*vect[3])
+  M["yz"] =2.0*(vect[2]*vect[3]-vect[0]*vect[1])
+  M["zy"] =2.0*(vect[2]*vect[3]+vect[0]*vect[1])
+  M["zx"] =2.0*(vect[1]*vect[3]-vect[0]*vect[2])
+  M["xz"] =2.0*(vect[1]*vect[3]+vect[0]*vect[2])
+
+  old = copy.deepcopy(mol2)
+  for i in range(len(mol2)):
+    mol2[i]["x"] = M["xx"]*old[i]["x"]+M["xy"]*old[i]["y"]+M["xz"]*old[i]["z"]+center1["x"]
+    mol2[i]["y"] = M["yx"]*old[i]["x"]+M["yy"]*old[i]["y"]+M["yz"]*old[i]["z"]+center1["y"]
+    mol2[i]["z"] = M["zx"]*old[i]["x"]+M["zy"]*old[i]["y"]+M["zz"]*old[i]["z"]+center1["z"]
+
+  return
+
+#=============================
 # Read the system file
 
 # Skip the file until the solute is found is found
@@ -63,16 +185,6 @@ for i in range(num):
   tmp["z"] = float(tmp["z"])
   tmp["q"] = float(tmp["q"])
   mol.append(tmp)
-
-# Calculate center of solute molecule
-sol_center = { "x": 0.0, "y": 0.0, "z": 0.0 }
-for i in range(num):
-  sol_center["x"] += mol[i]["x"]
-  sol_center["y"] += mol[i]["y"]
-  sol_center["z"] += mol[i]["z"]
-sol_center["x"] = sol_center["x"]/num
-sol_center["y"] = sol_center["y"]/num
-sol_center["z"] = sol_center["z"]/num
 
 file_system.close()
 
@@ -117,25 +229,19 @@ format_str = "%%5d%%5s%%5s%%5d%%%sf%%%sf%%%sf%%%sf%%%sf%%%sf\n" % (coord_prec, c
 file_gro = open(gro_input, "r")
 file_gro_out = open(gro_output, "w")
 
-# First read the solute coordinates and calculate its center
+# First read the solute coordinates
 file_gro.next()
 file_gro.next()
-gro_center = { "x": 0.0, "y": 0.0, "z": 0.0 }
+mol_gro = []
 for i in range(num):
   tmp = dict(zip(("x","y","z"),file_gro.next()[20:].split()))
-  gro_center["x"] += float(tmp["x"])*10
-  gro_center["y"] += float(tmp["y"])*10
-  gro_center["z"] += float(tmp["z"])*10
-gro_center["x"] = gro_center["x"]/num
-gro_center["y"] = gro_center["y"]/num
-gro_center["z"] = gro_center["z"]/num
+  tmp["x"] = float(tmp["x"])*10
+  tmp["y"] = float(tmp["y"])*10
+  tmp["z"] = float(tmp["z"])*10
+  mol_gro.append(tmp)
 
-# Modify the input coordinates to match centers
-# (assuming orientation is the same)
-for i in range(num):
-  mol[i]["x"] += gro_center["x"]-sol_center["x"]
-  mol[i]["y"] += gro_center["y"]-sol_center["y"]
-  mol[i]["z"] += gro_center["z"]-sol_center["z"]
+# Modify the input coordinates to fit the original orientation
+superpose ( mol_gro, mol )
 
 # Back to the top of the file
 file_gro.seek(0)
