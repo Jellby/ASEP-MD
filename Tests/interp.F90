@@ -32,7 +32,7 @@ PROGRAM prueba
                                                  Pesos
   DOUBLE PRECISION, DIMENSION(:,:,:), ALLOCATABLE :: InterAtomIni,InterAtomFin
   LOGICAL, DIMENSION(:,:), ALLOCATABLE :: QInterIni,QInterFin
-  LOGICAL :: ModCoord
+  LOGICAL :: ModCoord,Sup
   CHARACTER(LEN=LLL) :: Linea,Fich1,Fich2
   DOUBLE PRECISION :: Lambda
   INTEGER :: U,i,j,Error,UEnt,USal
@@ -44,6 +44,7 @@ PROGRAM prueba
   DO WHILE (Error == 0)
     IF (INDEX(Linea,'#Inicial') /= 0) READ(Linea(INDEX(Linea,'=')+1:),*) Fich1
     IF (INDEX(Linea,'#Final') /= 0) READ(Linea(INDEX(Linea,'=')+1:),*) Fich2
+    IF (INDEX(Linea,'#Superponer') /= 0) READ(Linea(INDEX(Linea,'=')+1:),*) Sup
     READ(5,'(A)',IOSTAT=Error) Linea
   END DO
 
@@ -74,6 +75,8 @@ PROGRAM prueba
   ALLOCATE(QInterIni(SIZE(QInter,1),SIZE(QInter,2)))
   InterAtomIni(:,:,:)=InterAtom(:,:,:)
   QInterIni(:,:)=QInter(:,:)
+
+  IF (Sup) CALL SuperponerMoleculas(Inicial,Final,Pesos)
 
   ALLOCATE(Pesos(SIZE(Soluto,1)),Previo(SIZE(Soluto,1)))
   Pesos(:)=1.0D0
@@ -128,7 +131,6 @@ PROGRAM prueba
     CALL ModificarMoldy(UEnt,USal)
     CLOSE(USal)
 
-    IF (TipoCoordenadas == 2) CALL SuperponerMoleculas(Previo,Soluto,Pesos)
     WRITE(6,*) SIZE(Soluto,1)
     WRITE(6,*)
     DO j=1,SIZE(Soluto,1)

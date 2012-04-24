@@ -5,4 +5,5 @@ MaxIter = 10
 # Específicos para interpolacion, no quitar el # inicial
 #Inicial = test1.system
 #Final = test3.system
+#Superponer = .T.
 #Pesos = 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0

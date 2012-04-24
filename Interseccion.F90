@@ -171,7 +171,7 @@ SUBROUTINE OptimizarInterseccion(Mol,Fich)
 
     !Se comprueba la convergencia (gradiente y energía)
     Dir(:)=Normalizar(GradQM-Grad2QM)
-    Conv1=DOT_PRODUCT(GradCart,Dir)
+    Conv1=DOT_PRODUCT(GradF,Dir)
     Conv2=Norma(GradF-Conv1*Dir)
     Conv3=Energ-EnergPrev
     Conv1=Conv1/Sigma

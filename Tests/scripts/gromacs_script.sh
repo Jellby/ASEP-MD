@@ -5,6 +5,10 @@
 # $3: bare extension
 # $4: DCD trajectory file
 
+if [ $3 == "skip" ]; then
+  exit
+fi
+
 DIR=$(dirname $0)
 
 export FILENAME=PP
