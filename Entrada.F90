@@ -603,7 +603,7 @@ SUBROUTINE ValoresDefecto
     IF (TipoCargas == 1) CALL Mensaje('ValoresDefecto',29,.TRUE.)
   END IF
 
-  IF (MaxIter < Inicio) THEN
+  IF ((MaxIter < Inicio) .AND. VarEnt(43)) THEN
     CALL Mensaje('ValoresDefecto',40,.TRUE.)
   END IF
 

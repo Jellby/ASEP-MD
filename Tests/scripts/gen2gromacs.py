@@ -135,10 +135,11 @@ def superpose ( mol1, mol2 ):
         del adj[k][j]
       det = adj[0][0]*adj[1][1]*adj[2][2]+adj[0][1]*adj[1][2]*adj[2][0]+adj[0][2]*adj[1][0]*adj[2][1] \
            -adj[0][0]*adj[1][2]*adj[2][1]-adj[0][1]*adj[1][0]*adj[2][2]-adj[0][2]*adj[1][1]*adj[2][0]
+      det *= (-1)**(i+j)
       vect.append(det)
     norm = math.sqrt(vect[0]**2+vect[1]**2+vect[2]**2+vect[3]**2)
     if (norm > 1.0e-6):
-      vect[0] = vect[0]/norm
+      vect[0] = -vect[0]/norm
       vect[1] = vect[1]/norm
       vect[2] = vect[2]/norm
       vect[3] = vect[3]/norm
@@ -234,7 +235,10 @@ file_gro.next()
 file_gro.next()
 mol_gro = []
 for i in range(num):
-  tmp = dict(zip(("x","y","z"),file_gro.next()[20:].split()))
+  line = file_gro.next()
+  dots = [match.start() for match in re.finditer("\.", line[20:])]
+  width = dots[1]-dots[0]
+  tmp = dict(zip(("x","y","z"), [line[i:i+width] for i in range(20, len(line), width)]))
   tmp["x"] = float(tmp["x"])*10
   tmp["y"] = float(tmp["y"])*10
   tmp["z"] = float(tmp["z"])*10
@@ -254,7 +258,9 @@ file_gro_out.write("%5d\n" % numtot)
 # Read the atom coordinates and velocities
 for i in range(numtot):
   line = file_gro.next()
-  tmp = dict(zip(("x","y","z","vx","vy","vz"),line[20:].split()))
+  dots = [match.start() for match in re.finditer("\.", line[20:])]
+  width = dots[1]-dots[0]
+  tmp = dict(zip(("x","y","z","vx","vy","vz"), [line[i:i+width] for i in range(20, len(line), width)]))
   tmp["resnum"] = int(line[0:5])
   tmp["resname"] = line[5:10]
   tmp["atname"] = line[10:15]

@@ -7,6 +7,7 @@
 DIR=$(dirname $0)
 
 [ -n "$PBS_O_WORKDIR" ] || PBS_O_WORKDIR=$PWD
+cd $PBS_O_WORKDIR
 
 export Project=Test
 export HomeDir=$PBS_O_WORKDIR

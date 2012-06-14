@@ -119,7 +119,7 @@ for line in file_mol:
           Q_energy_lower = float(line.rstrip().split()[5])
     # Read values only for the interesting root
     elif (re.match("\s*Mulliken population Analysis for root number:", line)):
-      rasscf_root = int(line.rstrip().split()[6])
+      rasscf_root = int(line.partition(":")[2])
     if (rasscf_root != Q_root): continue
     if (re.match("\s*Dipole Moment \(Debye\):", line)):
       file_mol.next()

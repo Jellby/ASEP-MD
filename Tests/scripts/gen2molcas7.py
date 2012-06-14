@@ -39,8 +39,8 @@ main_block = """\
     5
 >>> RM JOBOLD
 
->>> COPY $Project.rasscf.molden.%(root)i.molden $Project.esp.molden
->>> COPY $Project.RasOrb.%(root)i               $Project.esp.RasOrb
+>>> COPY $Project.rasscf.molden.%(root)i $Project.esp.molden
+>>> COPY $Project.RasOrb.%(root)i        $Project.esp.RasOrb
 """ % {"root": Q_root}
 
 alaska = """\

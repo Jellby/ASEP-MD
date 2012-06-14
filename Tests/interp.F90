@@ -76,8 +76,6 @@ PROGRAM prueba
   InterAtomIni(:,:,:)=InterAtom(:,:,:)
   QInterIni(:,:)=QInter(:,:)
 
-  IF (Sup) CALL SuperponerMoleculas(Inicial,Final,Pesos)
-
   ALLOCATE(Pesos(SIZE(Soluto,1)),Previo(SIZE(Soluto,1)))
   Pesos(:)=1.0D0
   REWIND(5)
@@ -86,6 +84,8 @@ PROGRAM prueba
     IF (INDEX(Linea,'#Pesos') /= 0) READ(Linea(INDEX(Linea,'=')+1:),*) Pesos(:)
     READ(5,'(A)',IOSTAT=Error) Linea
   END DO
+
+  IF (Sup) CALL SuperponerMoleculas(Inicial,Final,Pesos)
 
   TipoCoord=TipoCoordenadas
   CALL DefinirCoordenadas(Inicial)
