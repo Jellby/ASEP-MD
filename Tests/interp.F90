@@ -38,6 +38,7 @@ PROGRAM prueba
   INTEGER :: U,i,j,Error,UEnt,USal
 
   CALL LeerEntrada(5)
+  Sup=.FALSE.
 
   REWIND(5)
   READ(5,'(A)',IOSTAT=Error) Linea

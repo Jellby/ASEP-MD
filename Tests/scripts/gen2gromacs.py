@@ -94,7 +94,7 @@ def superpose ( mol1, mol2 ):
   K.append( [ M["xx"]+M["yy"]+M["zz"], M["yz"]-M["zy"], M["zx"]-M["xz"], M["xy"]-M["yx"] ] )
   K.append( [ M["yz"]-M["zy"], M["xx"]-M["yy"]-M["zz"], M["xy"]+M["yx"], M["xz"]+M["zx"] ] )
   K.append( [ M["zx"]-M["xz"], M["xy"]+M["yx"], M["yy"]-M["xx"]-M["zz"], M["yz"]+M["zy"] ] )
-  K.append( [ M["xy"]-M["yx"], M["xz"]+M["yz"], M["yz"]+M["zy"], M["zz"]-M["xx"]-M["yy"] ] )
+  K.append( [ M["xy"]-M["yx"], M["xz"]+M["zx"], M["yz"]+M["zy"], M["zz"]-M["xx"]-M["yy"] ] )
 
   coef = []
   D = (M["xy"]**2+M["xz"]**2-M["yx"]**2-M["zx"]**2)**2
