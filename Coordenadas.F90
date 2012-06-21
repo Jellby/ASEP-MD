@@ -259,9 +259,11 @@ SUBROUTINE CoordenadasInternas(Mol)
         DO l=1,Num
           IF (Frag(l) /= j) CYCLE
           IF (Dists(k,l) > Dist) CYCLE
-          !Enlaces auxiliares interfragmento
-          Enlaces(k,l)=2
-          Enlaces(l,k)=2
+          IF (Enlaces(k,l) == 0) THEN
+            !Enlaces auxiliares interfragmento
+            Enlaces(k,l)=2
+            Enlaces(l,k)=2
+          END IF
         END DO
       END DO
     END DO

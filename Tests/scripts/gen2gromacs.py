@@ -238,7 +238,7 @@ for i in range(num):
   line = file_gro.next()
   dots = [match.start() for match in re.finditer("\.", line[20:])]
   width = dots[1]-dots[0]
-  tmp = dict(zip(("x","y","z"), [line[i:i+width] for i in range(20, len(line), width)]))
+  tmp = dict(zip(("x","y","z"), [line[j:j+width] for j in range(20, len(line), width)]))
   tmp["x"] = float(tmp["x"])*10
   tmp["y"] = float(tmp["y"])*10
   tmp["z"] = float(tmp["z"])*10
@@ -260,7 +260,7 @@ for i in range(numtot):
   line = file_gro.next()
   dots = [match.start() for match in re.finditer("\.", line[20:])]
   width = dots[1]-dots[0]
-  tmp = dict(zip(("x","y","z","vx","vy","vz"), [line[i:i+width] for i in range(20, len(line), width)]))
+  tmp = dict(zip(("x","y","z","vx","vy","vz"), [line[j:j+width] for j in range(20, len(line), width)]))
   tmp["resnum"] = int(line[0:5])
   tmp["resname"] = line[5:10]
   tmp["atname"] = line[10:15]

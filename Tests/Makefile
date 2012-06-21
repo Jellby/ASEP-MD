@@ -54,10 +54,10 @@ calcqm: calcqm.F90 $(MOLDY) $(ENT) $(EJEC) $(COMUN)
 dernum: dernum.F90 $(MOLDY) $(ENT) $(EJEC) $(COMUN)
 	$(COMP) $^ -o $@
 
-coord: coord.F90 $(COORD) $(MOLDY) $(ENT) $(COMUN)
+coord: coord.F90 $(COORD) $(GENMM) $(MOLDY) $(ENT) $(COMUN)
 	$(COMP) $^ -o $@
 
-opt: opt.F90 $(OPT) $(MOLDY) $(COMUN)
+opt: opt.F90 $(OPT) $(GENMM) $(MOLDY) $(COMUN)
 	$(COMP) $^ -o $@
 
 int: int.F90 $(INT) $(MOLDY) $(COMUN)

@@ -22,6 +22,7 @@ PROGRAM prueba
   USE Parametros
   USE Sistema
   USE Entrada
+  USE GenericoMM
   USE Moldy
   USE Coordenadas
   USE Utilidades
@@ -32,15 +33,24 @@ PROGRAM prueba
 
   CALL LeerEntrada(5)
 
-  U=NuevaUnidad()
-  OPEN(U,FILE=TRIM(EntradaMM))
-  CALL LeerControlMoldy(U)
-  CLOSE(U)
+  SELECT CASE (ProgramaMM)
+   CASE (0) !Genérico
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(EntradaMM))
+    CALL LeerSistemaGenerico(U)
+    CLOSE(U)
 
-  U=NuevaUnidad()
-  OPEN(U,FILE=TRIM(MoldyInput))
-  CALL LeerSistemaMoldy(U)
-  CLOSE(U)
+   CASE (1) !Moldy
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
+    CALL LeerControlMoldy(U)
+    CLOSE(U)
+
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
+    CALL LeerSistemaMoldy(U)
+    CLOSE(U)
+  END SELECT
 
   TipoCoord=TipoCoordenadas
   CALL DefinirCoordenadas(Soluto)
