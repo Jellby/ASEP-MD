@@ -99,7 +99,6 @@ SUBROUTINE ConstruirCavidad(Centros,Radios,R,NDiv)
   DO i=1,SIZE(Centros,1)
     RMax=MAX(RMax,Norma(Esferas(i,1:3))+Esferas(i,4))
   END DO
-  WRITE(6,*) 'RMax: ',RMax
 
   !Se calculan las intersecciones de dos esferas
   UTmp=NuevaUnidad()
