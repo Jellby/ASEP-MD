@@ -35,12 +35,13 @@ MODULE Cavidad
 ! Int2:     Matriz con los índices de las intersecciones de dos esferas
 ! Int3:     Matriz con los índices de las intersecciones de tres esferas
 ! RDis:     Radio de la esfera que representa al disolvente (radio de exclusión)
+! RMax:     Radio máximo de la cavidad
 !-------------------------------------------------------------------------------
 DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: CavVert,CavCent,Esferas, &
                                                  Esferas2,Esferas3,Toros
 INTEGER, DIMENSION(:,:), ALLOCATABLE :: CavTrian,Int2
 INTEGER, DIMENSION(:,:,:), ALLOCATABLE :: Int3
-DOUBLE PRECISION :: RDis
+DOUBLE PRECISION :: RDis,RMax
 
 CONTAINS
 !ConstruirCavidad(Centros,Radios,R,NDiv)
@@ -92,6 +93,13 @@ SUBROUTINE ConstruirCavidad(Centros,Radios,R,NDiv)
   Esferas(:,1:3)=Centros(:,:)
   Esferas(:,4)=Radios(:)
   RDis=R
+
+  !Calcula RMax
+  RMax=0.0D0
+  DO i=1,SIZE(Centros,1)
+    RMax=MAX(RMax,Norma(Esferas(i,1:3))+Esferas(i,4))
+  END DO
+  WRITE(6,*) 'RMax: ',RMax
 
   !Se calculan las intersecciones de dos esferas
   UTmp=NuevaUnidad()
@@ -263,6 +271,9 @@ FUNCTION Interior(Pun)
 
   N=SIZE(Esferas,1)
   Interior=.FALSE.
+
+  !Si está fuera de RMax, está fuera de la cavidad
+  IF (Norma(Pun(:)) > RMax) RETURN
 
   !Si el punto está dentro de alguno de los elementos, sale del bucle
   Externo: DO i=1,N

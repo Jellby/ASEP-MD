@@ -989,6 +989,7 @@ END SUBROUTINE IncrementoRFO
 ! Cor:     Matriz de corrección
 ! Aux:     Vector auxiliar
 ! a,b:     Escalares
+! i,j:     Contadores
 !-------------------------------------------------------------------------------
 SUBROUTINE ActualizarHessiana(Inc,IncGrad,Hess,Tipo)
   USE Utilidades
@@ -1000,6 +1001,7 @@ SUBROUTINE ActualizarHessiana(Inc,IncGrad,Hess,Tipo)
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Cor
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: Aux
   DOUBLE PRECISION :: a,b
+  INTEGER :: i,j
 
   ALLOCATE(Cor(SIZE(Inc,1),SIZE(Inc,1)),Aux(SIZE(Inc,1)))
 
@@ -1036,6 +1038,14 @@ SUBROUTINE ActualizarHessiana(Inc,IncGrad,Hess,Tipo)
   END SELECT
 
   Hess(:,:)=Hess(:,:)+Cor(:,:)
+
+  !Asegura que la matriz es simétrica
+  DO i=1,SIZE(Inc,1)
+    DO j=i+1,SIZE(Inc,1)
+      Hess(i,j)=0.5D0*(Hess(i,j)+Hess(j,i))
+      Hess(j,i)=Hess(i,j)
+    END DO
+  END DO
 
   DEALLOCATE(Cor,Aux)
 

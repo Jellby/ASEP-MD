@@ -63,10 +63,10 @@ opt: opt.F90 $(OPT) $(GENMM) $(MOLDY) $(COMUN)
 int: int.F90 $(INT) $(MOLDY) $(COMUN)
 	$(COMP) $^ -o $@
 
-cav: cav.F90 $(CAV) $(ENT) $(MOLDY) $(COMUN)
+cav: cav.F90 $(CAV) $(ENT) $(GENMM) $(MOLDY) $(COMUN)
 	$(COMP) $^ -o $@
 
-malla: malla.F90 $(MAL) $(ENT) $(MOLDY) $(COMUN)
+malla: malla.F90 $(MAL) $(ENT) $(GENMM) $(MOLDY) $(COMUN)
 	$(COMP) $^ -o $@
 
 calcmm: calcmm.F90 $(ENT) $(MOLDY) $(MAL) $(CAV) $(EJEC) $(COMUN)
