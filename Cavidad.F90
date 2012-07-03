@@ -95,6 +95,8 @@ SUBROUTINE ConstruirCavidad(Centros,Radios,R,NDiv)
   RDis=R
 
   !Calcula RMax
+  ! (la esfera podría ser más pequeña si se desplaza el centro,
+  ! pero probablemente no merece la pena calcularla)
   RMax=0.0D0
   DO i=1,SIZE(Centros,1)
     RMax=MAX(RMax,Norma(Esferas(i,1:3))+Esferas(i,4))

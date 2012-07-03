@@ -31,7 +31,6 @@ PROGRAM prueba
 
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Esf
   DOUBLE PRECISION, DIMENSION(3) :: Aux
-  DOUBLE PRECISION :: R
   INTEGER :: NV,U,m,i,j,k
 
   CALL LeerEntrada(5)
@@ -91,11 +90,6 @@ PROGRAM prueba
   END DO
   WRITE(6,'(A)') 'END'
   WRITE(6,*) '*/'
-
-  R=0.0D0
-  DO i=1,SIZE(Esferas,1)
-    R=MAX(R,Norma(Esferas(i,1:3))+Esferas(i,4))
-  END DO
 
   !Formato POV-Ray
   WRITE(6,*) '//POV-Ray'
@@ -186,7 +180,7 @@ PROGRAM prueba
       END DO
     END DO
   END DO
-  WRITE(6,*) '  bounded_by { sphere { 0,',R,' } }'
+  WRITE(6,*) '  bounded_by { sphere { 0,',RMax,' } }'
   WRITE(6,*) '  no_shadow'
   WRITE(6,*) '}'
   WRITE(6,*) 'mesh{'
