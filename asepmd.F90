@@ -47,6 +47,8 @@ PROGRAM ASEPMD
 
   CALL LeerEntrada(5)
 
+  CALL EscribirValores()
+
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico
     U=NuevaUnidad()

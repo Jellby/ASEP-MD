@@ -42,6 +42,7 @@ CONTAINS
 !IniciarAleatorio()
 !LeerSiguienteLinea(Fich,Lin,Fin)
 !PasarMinusculas(Lin)
+!QuitarCeros(Texto)
 !Intercambiar(A,B)
 !Norma(Vec)
 !Normalizar(Vec)
@@ -191,6 +192,40 @@ SUBROUTINE PasarMinusculas(Lin)
   END DO
 
 END SUBROUTINE PasarMinusculas
+
+!-------------------------------------------------------------------------------
+! Elimina ceros innecesarios de un número escrito con exponente
+!-------------------------------------------------------------------------------
+! Texto:   El número escrito como texto
+! Pos:     Posición dentro del texto que se va buscando
+!-------------------------------------------------------------------------------
+SUBROUTINE QuitarCeros(Texto)
+  IMPLICIT NONE
+  CHARACTER(LEN=*), INTENT(INOUT) :: Texto
+
+  INTEGER :: Pos
+
+  !Se eliminan todos los ceros antes de la "E"
+  Pos=INDEX(Texto,'0E')
+  DO WHILE (Pos /= 0)
+    Texto(Pos:)=Texto(Pos+1:)//' '
+    Pos=INDEX(Texto,'0E')
+  END DO
+  !Si hay un punto decimal justo antes de la "E" se añade un cero
+  Pos=INDEX(Texto,'.E')
+  IF (Pos /= 0) Texto(Pos+1:)='0'//Texto(Pos+1:)
+
+  !Se eliminan todos los ceros iniciales del exponente
+  Pos=INDEX(Texto,'E+0')+INDEX(Texto,'E-0')
+  DO WHILE (Pos /= 0)
+    Texto(Pos+2:)=Texto(Pos+3:)//' '
+    Pos=INDEX(Texto,'E+0')+INDEX(Texto,'E-0')
+  END DO
+  !Si el exponente era cero, se elimina
+  Pos=INDEX(Texto,'E+ ')+INDEX(Texto,'E- ')
+  IF (Pos /= 0)Texto(Pos:Pos+2)='  '
+
+END SUBROUTINE QuitarCeros
 
 !-------------------------------------------------------------------------------
 ! Intercambia dos números o dos vectores

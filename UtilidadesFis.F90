@@ -414,7 +414,7 @@ SUBROUTINE SuperponerMoleculas(Ref,Mol,Pesos,Trans)
     P(5)=P(2)+2.0D0*P(3)*Valor+4.0D0*Valor**3
     Valor=Valor-P(4)/P(5)
   END DO
- 
+
   !Se obtiene el vector propio correspondiente
   MatrizK(1,1)=MatrizK(1,1)-Valor
   MatrizK(2,2)=MatrizK(2,2)-Valor

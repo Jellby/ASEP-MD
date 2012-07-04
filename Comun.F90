@@ -261,7 +261,7 @@ MODULE Espanol
     DATA Errores(38) /'El MM generico requiere una sola molecula de soluto.'/
     DATA Errores(39) /'Numero incorrecto de atomos en las configuraciones.'/
     DATA Errores(40) /'La primera iteracion no puede ser mayor que el maximo.'/
-  CHARACTER(LEN=LLL), DIMENSION(40) :: Textos
+  CHARACTER(LEN=LLL), DIMENSION(74) :: Textos
     DATA Textos( 1) /'Maxima componente del gradiente:'/
     DATA Textos( 2) /'Diferencia de energia:'/
     DATA Textos( 3) /'Maxima componente del incremento:'/
@@ -302,6 +302,40 @@ MODULE Espanol
     DATA Textos(38) /'RRms:'/
     DATA Textos(39) /'Error maximo en el potencial:'/
     DATA Textos(40) /'Puntos para ajustar el potencial:'/
+    DATA Textos(41) /'SI'/
+    DATA Textos(42) /'NO'/
+    DATA Textos(43) /'Mulliken'/
+    DATA Textos(44) /'ESP'/
+    DATA Textos(45) /'Potencial'/
+    DATA Textos(46) /'Externo'/
+    DATA Textos(47) /'Generico'/
+    DATA Textos(48) /'Gaussian'/
+    DATA Textos(49) /'Molcas'/
+    DATA Textos(50) /'Ninguna'/
+    DATA Textos(51) /'BFGS'/
+    DATA Textos(52) /'Murtagh-Sargent'/
+    DATA Textos(53) /'Powell'/
+    DATA Textos(54) /'Bofill'/
+    DATA Textos(55) /'Gradiente'/
+    DATA Textos(56) /'Gradiente-conjugado'/
+    DATA Textos(57) /'Newton-Raphson'/
+    DATA Textos(58) /'RFO'/
+    DATA Textos(59) /'Cartesianas'/
+    DATA Textos(60) /'Ponderadas'/
+    DATA Textos(61) /'Internas'/
+    DATA Textos(62) /'Exacta'/
+    DATA Textos(63) /'Unidad'/
+    DATA Textos(64) /'Simple'/
+    DATA Textos(65) /'Modelo'/
+    DATA Textos(66) /'Completa'/
+    DATA Textos(67) /'Moldy'/
+    DATA Textos(68) /'Esferica'/
+    DATA Textos(69) /'Proporcional'/
+    DATA Textos(70) /'Constante'/
+    DATA Textos(71) /'Cubica'/
+    DATA Textos(72) /'FCC'/
+    DATA Textos(73) /'BCC'/
+    DATA Textos(74) /'Normal'/
 
 END MODULE Espanol
 
@@ -409,7 +443,7 @@ MODULE English
     DATA Errores(38) /'Generic MM requires a single solute molecule.'/
     DATA Errores(39) /'Wrong number of atoms in configurations.'/
     DATA Errores(40) /'The first iteration cannot be larger than the maximum.'/
-  CHARACTER(LEN=LLL), DIMENSION(40) :: Textos
+  CHARACTER(LEN=LLL), DIMENSION(74) :: Textos
     DATA Textos( 1) /'Maximum component of the gradient:'/
     DATA Textos( 2) /'Energy difference:'/
     DATA Textos( 3) /'Maximum component of the increment:'/
@@ -450,5 +484,39 @@ MODULE English
     DATA Textos(38) /'RRms:'/
     DATA Textos(39) /'Maximum error in the potential:'/
     DATA Textos(40) /'Points for potential fitting:'/
+    DATA Textos(41) /'YES'/
+    DATA Textos(42) /'NO'/
+    DATA Textos(43) /'Mulliken'/
+    DATA Textos(44) /'ESP'/
+    DATA Textos(45) /'Potential'/
+    DATA Textos(46) /'External'/
+    DATA Textos(47) /'Generic'/
+    DATA Textos(48) /'Gaussian'/
+    DATA Textos(49) /'Molcas'/
+    DATA Textos(50) /'None'/
+    DATA Textos(51) /'BFGS'/
+    DATA Textos(52) /'Murtagh-Sargent'/
+    DATA Textos(53) /'Powell'/
+    DATA Textos(54) /'Bofill'/
+    DATA Textos(55) /'Steepest-descent'/
+    DATA Textos(56) /'Conjugate-gradient'/
+    DATA Textos(57) /'Newton-Raphson'/
+    DATA Textos(58) /'RFO'/
+    DATA Textos(59) /'Cartesian'/
+    DATA Textos(60) /'Mass-weighted'/
+    DATA Textos(61) /'Internal'/
+    DATA Textos(62) /'Exact'/
+    DATA Textos(63) /'Unit'/
+    DATA Textos(64) /'Simple'/
+    DATA Textos(65) /'Model'/
+    DATA Textos(66) /'Full'/
+    DATA Textos(67) /'Moldy'/
+    DATA Textos(68) /'Spherical'/
+    DATA Textos(69) /'Proportional'/
+    DATA Textos(70) /'Constant'/
+    DATA Textos(71) /'Cubic'/
+    DATA Textos(72) /'FCC'/
+    DATA Textos(73) /'BCC'/
+    DATA Textos(74) /'Normal'/
   
 END MODULE English

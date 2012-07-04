@@ -609,4 +609,313 @@ SUBROUTINE ValoresDefecto
 
 END SUBROUTINE ValoresDefecto
 
+!-------------------------------------------------------------------------------
+! Escribe los valores de todas las variables
+!-------------------------------------------------------------------------------
+! Etiqueta:
+! Valor:
+!-------------------------------------------------------------------------------
+SUBROUTINE EscribirValores
+  USE Parametros
+  USE Utilidades
+  IMPLICIT NONE
+
+  CHARACTER :: Etiqueta
+  CHARACTER(LEN=LLL) :: Valor
+
+#define ETIQUETA(x) IF (VarEnt(x)) THEN ; Etiqueta=' ' ; ELSE ; Etiqueta='#' ; END IF
+
+  ETIQUETA(43)
+  WRITE(Valor,101) Inicio
+  WRITE(6,100) Etiqueta, TRIM(Variables(43)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(41)
+  WRITE(Valor,101) MaxIter
+  WRITE(6,100) Etiqueta, TRIM(Variables(41)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(42)
+  IF (InicioVacio) THEN
+    Valor=Textos(41)
+   ELSE
+    Valor=Textos(42)
+  END IF
+  WRITE(6,100) Etiqueta, TRIM(Variables(42)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(27)
+  SELECT CASE (ProgramaMM)
+   CASE (0)
+    Valor=Textos(47)
+   CASE (1)
+    Valor=Textos(67)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(27)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(28)
+  WRITE(Valor,102) TRIM(EjecutableMM)
+  WRITE(6,100) Etiqueta, TRIM(Variables(28)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(4)
+  SELECT CASE (ProgramaQM)
+   CASE (0)
+    Valor=Textos(47)
+   CASE (1)
+    Valor=Textos(48)
+   CASE (2)
+    Valor=Textos(49)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(4)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(5)
+  WRITE(Valor,102) TRIM(EjecutableQM)
+  WRITE(6,100) Etiqueta, TRIM(Variables(5)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(2)
+  WRITE(Valor,102) TRIM(EntradaMM)
+  WRITE(6,100) Etiqueta, TRIM(Variables(2)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(39)
+  WRITE(Valor,102) TRIM(SalidaMM)
+  WRITE(6,100) Etiqueta, TRIM(Variables(39)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(44)
+  WRITE(Valor,102) TRIM(TrayectoriaMM)
+  WRITE(6,100) Etiqueta, TRIM(Variables(44)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(3)
+  WRITE(Valor,102) TRIM(EntradaQM)
+  WRITE(6,100) Etiqueta, TRIM(Variables(3)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(6)
+  WRITE(Valor,102) TRIM(SalidaQM)
+  WRITE(6,100) Etiqueta, TRIM(Variables(6)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(40)
+  WRITE(Valor,102) TRIM(SalidaOpt)
+  WRITE(6,100) Etiqueta, TRIM(Variables(40)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(25)
+  WRITE(Valor,102) TRIM(FChkGaussian)
+  WRITE(6,100) Etiqueta, TRIM(Variables(25)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(29)
+  WRITE(Valor,102) TRIM(DumpextMoldy)
+  WRITE(6,100) Etiqueta, TRIM(Variables(29)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(26)
+  WRITE(Valor,102) TRIM(CargasExternas)
+  WRITE(6,100) Etiqueta, TRIM(Variables(26)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(1)
+  SELECT CASE (TipoCargas)
+   CASE (0)
+    Valor=Textos(43)
+   CASE (1)
+    Valor=Textos(44)
+   CASE (2)
+    Valor=Textos(45)
+   CASE (3)
+    Valor=Textos(46)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(1)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(20)
+  WRITE(Valor,102) TRIM(FicheroCargas)
+  WRITE(6,100) Etiqueta, TRIM(Variables(20)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(30)
+  WRITE(Valor,101) NumConfig
+  WRITE(6,100) Etiqueta, TRIM(Variables(30)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(37)
+  WRITE(Valor,103) DistCargas
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(37)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(38)
+  SELECT CASE (TipoReduccion)
+   CASE (-1)
+    Valor=Textos(74)
+   CASE (0)
+    Valor=Textos(71)
+   CASE (1)
+    Valor=Textos(72)
+   CASE (2)
+    Valor=Textos(73)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(38)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(36)
+  WRITE(Valor,103) CorteRF
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(36)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(31)
+  WRITE(Valor,103) Dielectrica
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(31)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(34)
+  SELECT CASE (TipoCavidad)
+   CASE (0)
+    Valor=Textos(68)
+   CASE (1)
+    Valor=Textos(69)
+   CASE (2)
+    Valor=Textos(70)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(34)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(21)
+  WRITE(Valor,103) RadioCavidad
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(21)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(22)
+  WRITE(Valor,101) Subdivisiones
+  WRITE(6,100) Etiqueta, TRIM(Variables(22)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(23)
+  WRITE(Valor,103) RadioDisolvente
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(23)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(35)
+  SELECT CASE (TipoMalla)
+   CASE (0)
+    Valor=Textos(71)
+   CASE (1)
+    Valor=Textos(72)
+   CASE (2)
+    Valor=Textos(73)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(35)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(33)
+  WRITE(Valor,103) FactorMalla
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(33)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(32)
+  WRITE(Valor,103) DistMalla
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(32)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(24)
+  WRITE(Valor,102) TRIM(OptContinuacion)
+  WRITE(6,100) Etiqueta, TRIM(Variables(24)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(11)
+  SELECT CASE (TipoCoordenadas)
+   CASE (0)
+    Valor=Textos(59)
+   CASE (1)
+    Valor=Textos(60)
+   CASE (2)
+    Valor=Textos(61)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(11)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(12)
+  WRITE(Valor,102) TRIM(AltCoordenadas)
+  WRITE(6,100) Etiqueta, TRIM(Variables(12)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(13)
+  WRITE(Valor,101) MaxIterOpt
+  WRITE(6,100) Etiqueta, TRIM(Variables(13)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(10)
+  SELECT CASE (MetodoOptim)
+   CASE (0)
+    Valor=Textos(55)
+   CASE (1)
+    Valor=Textos(56)
+   CASE (2)
+    Valor=Textos(57)
+   CASE (3)
+    Valor=Textos(58)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(10)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(18)
+  SELECT CASE (HessInicial)
+   CASE (0)
+    Valor=Textos(62)
+   CASE (1)
+    Valor=Textos(63)
+   CASE (2)
+    Valor=Textos(64)
+   CASE (3)
+    Valor=Textos(65)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(18)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(7)
+  WRITE(Valor,101) CalcHessiana
+  WRITE(6,100) Etiqueta, TRIM(Variables(7)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(8)
+  SELECT CASE (Actualizacion)
+   CASE (0)
+    Valor=Textos(50)
+   CASE (1)
+    Valor=Textos(51)
+   CASE (2)
+    Valor=Textos(52)
+   CASE (3)
+    Valor=Textos(53)
+   CASE (4)
+    Valor=Textos(54)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(8)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(19)
+  SELECT CASE (BusquedaLineal)
+   CASE (0)
+    Valor=Textos(50)
+   CASE (1)
+    Valor=Textos(64)
+   CASE (2)
+    Valor=Textos(66)
+  END SELECT
+  WRITE(6,100) Etiqueta, TRIM(Variables(19)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(9)
+  IF (EstadoTransicion) THEN
+    Valor=Textos(41)
+   ELSE
+    Valor=Textos(42)
+  END IF
+  WRITE(6,100) Etiqueta, TRIM(Variables(9)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(14)
+  WRITE(Valor,103) ConvGradOpt
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(14)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(16)
+  WRITE(Valor,103) ConvPasoOpt
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(16)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(15)
+  WRITE(Valor,103) ConvEnerOpt
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(15)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(17)
+  WRITE(Valor,103) MaxPasoOpt
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(17)), TRIM(ADJUSTL(Valor))
+
+  WRITE(6,*)
+  WRITE(6,10)
+
+ 10 FORMAT(80('='))
+100 FORMAT(A,' ',A,' = ',T25,A)
+101 FORMAT(I6)
+102 FORMAT("'",A,"'")
+103 FORMAT(ES20.12E3)
+
+END SUBROUTINE EscribirValores
+
 END MODULE Entrada
