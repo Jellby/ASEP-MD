@@ -199,6 +199,7 @@ SUBROUTINE LeerConfigsGenerico
   Tray%Nombre=TRIM(TrayectoriaMM)
   CALL AbrirDCD(Tray)
   IF (Tray%NAtomos /= Num) CALL Mensaje('LeerConfigsGenerico',39,.TRUE.)
+  IF (Tray%Configs < NumConfig) CALL Mensaje('LeerConfigsGenerico',33,.TRUE.)
 
   ALLOCATE(SolConf(SIZE(Soluto,1)),Pos(Num,3))
   SolConf(:)=Soluto(:)
