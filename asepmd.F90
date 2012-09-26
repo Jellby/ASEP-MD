@@ -52,7 +52,7 @@ PROGRAM ASEPMD
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(EntradaMM))
+    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaGenerico(U)
     CLOSE(U)
 
@@ -273,7 +273,7 @@ SUBROUTINE GenerarCavidad
   CargasAjustadas(1:SIZE(CavCent,1),1:3)=CavCent(:,1:3)
 
   ! Los vértices, que son menos, están más lejos
-  CALL ConstruirCavidad(Esf(:,1:3),Esf(:,4)+2*RadioDisolvente,RadioDisolvente, &
+  CALL ConstruirCavidad(Esf(:,1:3),Esf(:,4)+2.0D0*RadioDisolvente,RadioDisolvente, &
                         Subdivisiones)
 
   CargasAjustadas(SIZE(CavCent,1)+1:,1:3)=CavVert(:,1:3)

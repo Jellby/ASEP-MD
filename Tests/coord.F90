@@ -36,7 +36,7 @@ PROGRAM prueba
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(EntradaMM))
+    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaGenerico(U)
     CLOSE(U)
 
@@ -75,17 +75,18 @@ PROGRAM prueba
   WRITE(6,100) SIZE(Geometria,1)
 
   DO i=1,SIZE(DefCoord,1)
-    IF (DefCoord(i,1) == 0) THEN
-      IF (TipoCoord == 1) THEN
-        WRITE(6,102) (i-1)/3+1,MOD(i-1,3)+1,Geometria(i)/AngstromAtomica/SQRT(AmuAtomica)
+    SELECT CASE (TipoCoord)
+     CASE (0)
+      WRITE(6,102) (i-1)/3+1,MOD(i-1,3)+1,Geometria(i)/AngstromAtomica
+     CASE (1)
+      WRITE(6,102) (i-1)/3+1,MOD(i-1,3)+1,Geometria(i)/AngstromAtomica/SQRT(AmuAtomica)
+     CASE (2)
+      IF (DefCoord(i,3) == 0) THEN
+        WRITE(6,101) DefCoord(i,:),Geometria(i)/AngstromAtomica
        ELSE
-        WRITE(6,102) (i-1)/3+1,MOD(i-1,3)+1,Geometria(i)/AngstromAtomica
+        WRITE(6,101) DefCoord(i,:),Geometria(i)/Grado
       END IF
-     ELSE IF (DefCoord(i,3) == 0) THEN
-      WRITE(6,101) DefCoord(i,:),Geometria(i)/AngstromAtomica
-     ELSE
-      WRITE(6,101) DefCoord(i,:),Geometria(i)/Grado
-    END IF
+    END SELECT
   END DO
 
 100 FORMAT('N. coordenadas:',1X,I4)

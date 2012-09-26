@@ -261,7 +261,7 @@ MODULE Espanol
     DATA Errores(38) /'El MM generico requiere una sola molecula de soluto.'/
     DATA Errores(39) /'Numero incorrecto de atomos en las configuraciones.'/
     DATA Errores(40) /'La primera iteracion no puede ser mayor que el maximo.'/
-  CHARACTER(LEN=LLL), DIMENSION(74) :: Textos
+  CHARACTER(LEN=LLL), DIMENSION(77) :: Textos
     DATA Textos( 1) /'Maxima componente del gradiente:'/
     DATA Textos( 2) /'Diferencia de energia:'/
     DATA Textos( 3) /'Maxima componente del incremento:'/
@@ -336,6 +336,9 @@ MODULE Espanol
     DATA Textos(72) /'FCC'/
     DATA Textos(73) /'BCC'/
     DATA Textos(74) /'Normal'/
+    DATA Textos(75) /'Traslacion'/
+    DATA Textos(76) /'Rotacion'/
+    DATA Textos(77) /'Cartesiana'/
 
 END MODULE Espanol
 
@@ -443,7 +446,7 @@ MODULE English
     DATA Errores(38) /'Generic MM requires a single solute molecule.'/
     DATA Errores(39) /'Wrong number of atoms in configurations.'/
     DATA Errores(40) /'The first iteration cannot be larger than the maximum.'/
-  CHARACTER(LEN=LLL), DIMENSION(74) :: Textos
+  CHARACTER(LEN=LLL), DIMENSION(77) :: Textos
     DATA Textos( 1) /'Maximum component of the gradient:'/
     DATA Textos( 2) /'Energy difference:'/
     DATA Textos( 3) /'Maximum component of the increment:'/
@@ -466,7 +469,7 @@ MODULE English
     DATA Textos(20) /'Approximate and projected Hessian (Eh/(a0^2))'/
     DATA Textos(21) /'Combination'/
     DATA Textos(22) /'Resuming an interrupted calculation'/
-    DATA Textos(15) /'QM Energy:'/
+    DATA Textos(23) /'QM Energy:'/
     DATA Textos(24) /'After the MM simulation'/
     DATA Textos(25) /'After the QM calculation'/
     DATA Textos(26) /'Solute-solvent <q-q> interaction:'/
@@ -518,5 +521,8 @@ MODULE English
     DATA Textos(72) /'FCC'/
     DATA Textos(73) /'BCC'/
     DATA Textos(74) /'Normal'/
+    DATA Textos(75) /'Translation'/
+    DATA Textos(76) /'Rotation'/
+    DATA Textos(77) /'Cartesian'/
   
 END MODULE English

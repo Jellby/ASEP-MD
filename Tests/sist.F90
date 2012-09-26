@@ -35,18 +35,18 @@ PROGRAM prueba
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(EntradaMM))
+    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaGenerico(U)
     CLOSE(U)
 
    CASE (1) !Moldy
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(EntradaMM))
+    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
     CALL LeerControlMoldy(U)
     CLOSE(U)
 
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(MoldyInput))
+    OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaMoldy(U)
     CLOSE(U)
   END SELECT

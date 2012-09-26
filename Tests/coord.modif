@@ -6,3 +6,6 @@
 # a b c			Ángulo
 # a b c d		Diedro
 # x(a-b-c-d)+y(e-f-g-h)	Combinación lineal de coordenadas
+# X/Y/Z			Traslación
+# RX/RY/RZ		Rotación
+# CX/CY/CZ a		Coordenada cartesiana

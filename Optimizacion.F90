@@ -375,6 +375,7 @@ SUBROUTINE OptimizarGeometria(Mol,Fich)
     USE Unidades
     IMPLICIT NONE
 
+    CHARACTER, DIMENSION(3), PARAMETER :: Eje=(/'x','y','z'/)
     INTEGER :: UCon,i
 
     !Escribe los datos necesarios para la continuación del cálculo
@@ -439,11 +440,26 @@ SUBROUTINE OptimizarGeometria(Mol,Fich)
       WRITE(Fich,100) TRIM(Textos(11))
       DO i=1,SIZE(DefCoord,1)
         IF (DefCoord(i,4) > 0) THEN
-          WRITE(Fich,102) TRIM(Textos(12)),DefCoord(i,1:4),Geometria(i)/Grado, &
-                          Gradiente(i)*Grado
+          IF (DefCoord(i,2) > 0) THEN
+            WRITE(Fich,102) TRIM(Textos(12)),DefCoord(i,1:4), &
+                            Geometria(i)/Grado,Gradiente(i)*Grado
+           ELSE IF (DefCoord(i,1) > 0) THEN
+            WRITE(Fich,109) TRIM(Textos(77)),DefCoord(i,1),Eje(DefCoord(i,4)), &
+                            Geometria(i)/AngstromAtomica, &
+                            Gradiente(i)*AngstromAtomica
+           ELSE
+            WRITE(Fich,108) TRIM(Textos(75)),Eje(DefCoord(i,4)), &
+                            Geometria(i)/AngstromAtomica, &
+                            Gradiente(i)*AngstromAtomica
+          END IF
         ELSE IF (DefCoord(i,3) > 0) THEN
-          WRITE(Fich,103) TRIM(Textos(13)),DefCoord(i,1:3),Geometria(i)/Grado, &
-                          Gradiente(i)*Grado
+          IF (DefCoord(i,1) > 0) THEN
+            WRITE(Fich,103) TRIM(Textos(13)),DefCoord(i,1:3), &
+                            Geometria(i)/Grado,Gradiente(i)*Grado
+           ELSE
+            WRITE(Fich,108) TRIM(Textos(76)),Eje(DefCoord(i,3)), &
+                            Geometria(i)/Grado,Gradiente(i)*Grado
+          END IF
         ELSE IF (DefCoord(i,1) > 0) THEN
           WRITE(Fich,104) TRIM(Textos(14)),DefCoord(i,1:2), &
                           Geometria(i)/AngstromAtomica, &
@@ -479,6 +495,8 @@ SUBROUTINE OptimizarGeometria(Mol,Fich)
   105 FORMAT(1X,A,T13,1(1X,I3),T30,2(1X,F16.10))
   106 FORMAT(A,1X,I3)
   107 FORMAT(A,T23,F18.10,1X,A)
+  108 FORMAT(1X,A,T13,1X,A3,T30,2(1X,F16.10))
+  109 FORMAT(1X,A,T13,1X,I3,1X,A3,T30,2(1X,F16.10))
 
   END SUBROUTINE EscribirGeometria
 
@@ -538,6 +556,10 @@ SUBROUTINE OptimizarGeometria(Mol,Fich)
     CLOSE(UCon)
 
     WRITE(Fich,100) TRIM(Textos(22))
+
+    !Se modifica OptContinuacion para evitar que vuelva a continuarse
+    !en los siguientes ciclos
+    OptContinuacion=''
 
   100 FORMAT(A)
 
@@ -1087,9 +1109,11 @@ SUBROUTINE HessianaInicial(Tipo)
    CASE (2) !Hessiana simple (unidad escalada)
     DO i=1,SIZE(Hessiana,1)
       IF (DefCoord(i,4) > 0) THEN      !Diedros
-        Hessiana(i,i)=0.1D0
+        !Si no es una traslación o coordenada cartesiana
+        IF (DefCoord(i,2) > 0) Hessiana(i,i)=0.1D0
       ELSE IF (DefCoord(i,3) > 0) THEN !Ángulos
-        Hessiana(i,i)=0.2D0
+        !Si no es una rotación
+        IF (DefCoord(i,2) > 0) Hessiana(i,i)=0.2D0
       ELSE IF (DefCoord(i,2) > 0) THEN !Distancias
         Hessiana(i,i)=0.5D0
        ELSE
@@ -1105,9 +1129,11 @@ SUBROUTINE HessianaInicial(Tipo)
       c=DefCoord(i,3)
       d=DefCoord(i,4)
       IF (d > 0) THEN      !Diedros
-        Hessiana(i,i)=KDie*Rho(a,b)*Rho(b,c)*Rho(c,d)
+        !Si no es una traslación o coordenada cartesiana
+        IF (b > 0) Hessiana(i,i)=KDie*Rho(a,b)*Rho(b,c)*Rho(c,d)
       ELSE IF (c > 0) THEN !Ángulos
-        Hessiana(i,i)=KAng*Rho(a,b)*Rho(b,c)
+        !Si no es una rotación
+        IF (b > 0) Hessiana(i,i)=KAng*Rho(a,b)*Rho(b,c)
       ELSE IF (b > 0) THEN !Distancias
         Hessiana(i,i)=KDis*Rho(a,b)
        ELSE

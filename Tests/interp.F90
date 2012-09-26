@@ -23,6 +23,7 @@ PROGRAM prueba
   USE Entrada
   USE Sistema
   USE Coordenadas
+  USE GenericoMM
   USE Moldy
   USE Utilidades
   USE UtilidadesFis
@@ -49,14 +50,23 @@ PROGRAM prueba
     READ(5,'(A)',IOSTAT=Error) Linea
   END DO
 
-  UEnt=NuevaUnidad()
-  OPEN(UEnt,FILE=TRIM(EntradaMM),STATUS='OLD',ACTION='READ')
-  CALL LeerControlMoldy(UEnt)
+  SELECT CASE (ProgramaMM)
+   CASE (0) !Genérico
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(Fich2),ACTION='READ',STATUS='OLD')
+    CALL LeerSistemaGenerico(U)
+    CLOSE(U)
 
-  U=NuevaUnidad()
-  OPEN(U,FILE=TRIM(Fich2))
-  CALL LeerSistemaMoldy(U)
-  CLOSE(U)
+   CASE (1) !Moldy
+    UEnt=NuevaUnidad()
+    OPEN(UEnt,FILE=TRIM(EntradaMM),STATUS='OLD',ACTION='READ')
+    CALL LeerControlMoldy(UEnt)
+
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(Fich2),ACTION='READ',STATUS='OLD')
+    CALL LeerSistemaMoldy(U)
+    CLOSE(U)
+  END SELECT
 
   ALLOCATE(Final(SIZE(Soluto,1)))
   Final(:)=Soluto(:)
@@ -65,10 +75,19 @@ PROGRAM prueba
   InterAtomFin(:,:,:)=InterAtom(:,:,:)
   QInterFin(:,:)=QInter(:,:)
 
-  U=NuevaUnidad()
-  OPEN(U,FILE=TRIM(Fich1))
-  CALL LeerSistemaMoldy(U)
-  CLOSE(U)
+  SELECT CASE (ProgramaMM)
+   CASE (0) !Genérico
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(Fich1),ACTION='READ',STATUS='OLD')
+    CALL LeerSistemaGenerico(U)
+    CLOSE(U)
+
+   CASE (1) !Moldy
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(Fich1),ACTION='READ',STATUS='OLD')
+    CALL LeerSistemaMoldy(U)
+    CLOSE(U)
+  END SELECT
 
   ALLOCATE(Inicial(SIZE(Soluto,1)))
   Inicial(:)=Soluto(:)
@@ -126,11 +145,21 @@ PROGRAM prueba
 
     WRITE(Extension,*) i
     Extension='.iter.'//ADJUSTL(Extension)
-    REWIND(UEnt)
-    USal=NuevaUnidad()
-    OPEN(USal,FILE=TRIM(EntradaMM)//TRIM(Extension),STATUS='REPLACE',ACTION='WRITE')
-    CALL ModificarMoldy(UEnt,USal)
-    CLOSE(USal)
+
+    SELECT CASE (ProgramaMM)
+     CASE (0) !Genérico
+      USal=NuevaUnidad()
+      OPEN(USal,FILE=TRIM(EntradaMM)//TRIM(Extension),STATUS='REPLACE',ACTION='WRITE')
+      CALL EntradaGenericoMM(USal)
+      CLOSE(USal)
+ 
+     CASE (1) !Moldy
+      REWIND(UEnt)
+      USal=NuevaUnidad()
+      OPEN(USal,FILE=TRIM(EntradaMM)//TRIM(Extension),STATUS='REPLACE',ACTION='WRITE')
+      CALL ModificarMoldy(UEnt,USal)
+      CLOSE(USal)
+    END SELECT
 
     WRITE(6,*) SIZE(Soluto,1)
     WRITE(6,*)
@@ -139,7 +168,7 @@ PROGRAM prueba
     END DO
   END DO
 
-  CLOSE(UEnt)
+  IF (ProgramaMM == 1) CLOSE(UEnt)
 
   DEALLOCATE(Inicial,Final,Previo,CoordFin,CoordDif,Coord,Paso,Pesos, &
              InterAtomIni,InterAtomFin,QInterIni,QInterFin)

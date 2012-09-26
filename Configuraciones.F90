@@ -874,7 +874,7 @@ SUBROUTINE ReducirCargas(U,Num,Cargas)
   END DO
 
   !La reducción es distinta si se hace con ajuste a una red o no
-  IF (TipoReduccion < 0) THEN
+  IF (TipoReduccion < 1) THEN
 
     !Para cada carga
     DO i=1,Num
@@ -901,7 +901,7 @@ SUBROUTINE ReducirCargas(U,Num,Cargas)
     !Se calculan la distancia de la red cubica base y los vecinos más próximos
     !según el tipo de malla
     SELECT CASE (TipoReduccion)
-     CASE (0) !Red cúbica simple
+     CASE (1) !Red cúbica simple
       R=DistCargas
       ALLOCATE(Vecinos(13,3))
       !Caras
@@ -920,7 +920,7 @@ SUBROUTINE ReducirCargas(U,Num,Cargas)
       Vecinos(11,:)=(/-1, 1, 1/)
       Vecinos(12,:)=(/ 1,-1, 1/)
       Vecinos(13,:)=(/ 1, 1,-1/)
-     CASE (1) !Red cúbica compacta
+     CASE (2) !Red cúbica compacta
       R=DistCargas/SQRT(2.0D0)
       ALLOCATE(Vecinos(9,3))
       !Caras
@@ -934,7 +934,7 @@ SUBROUTINE ReducirCargas(U,Num,Cargas)
       Vecinos(7,:)=(/ 2, 0, 0/)
       Vecinos(8,:)=(/ 0, 2, 0/)
       Vecinos(9,:)=(/ 0, 0, 2/)
-     CASE (2) !Red cúbica centrada en el cuerpo
+     CASE (3) !Red cúbica centrada en el cuerpo
       R=DistCargas/SQRT(3.0D0)
       ALLOCATE(Vecinos(7,3))
       !Caras
@@ -966,21 +966,21 @@ SUBROUTINE ReducirCargas(U,Num,Cargas)
     DO i=1,Num
       !Se halla el punto de la red más cercano a cada carga
       SELECT CASE (TipoReduccion)
-       CASE (1) !Red cúbica compacta
+       CASE (1) !Red cúbica simple
+        Indice(:)=NINT(CargasIni(i,1:3)/R)
+       CASE (2) !Red cúbica compacta
         Indice(:)=NINT(CargasIni(i,1:3)/R)
         IF (MOD(SUM(Indice(:)),2) /= 0) THEN
           Dif(:)=CargasIni(i,1:3)/R-Indice(:)
           j=SUM(MAXLOC(ABS(Dif(:))))
           Indice(j)=Indice(j)+NINT(SIGN(1.0D0,Dif(j)))
         END IF
-       CASE (2) !Red cúbica centrada en el cuerpo
+       CASE (3) !Red cúbica centrada en el cuerpo
         Indice(:)=2*NINT(0.5D0*CargasIni(i,1:3)/R)
         Dif(:)=CargasIni(i,1:3)/R-Indice(:)
         IF (SUM(ABS(Dif(:))) > 1.5D0) &
           Indice(:)=2*NINT(0.5D0*(CargasIni(i,1:3)/R-(/1.0D0,1.0D0,1.0D0/))) + &
                     (/1,1,1/)
-       CASE DEFAULT !Red cúbica simple
-        Indice(:)=NINT(CargasIni(i,1:3)/R)
       END SELECT
       Dist=Distancia(CargasIni(i,1:3),Indice(:)*R)
       j=Puntos(Indice(1),Indice(2),Indice(3))

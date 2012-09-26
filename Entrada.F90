@@ -52,7 +52,7 @@ MODULE Entrada
 #endif
 
 #ifndef LANG
-#define LANG Espanol
+#define LANG English
 #endif
 
 USE LANG
@@ -202,7 +202,7 @@ SUBROUTINE LeerVariable(Lin)
       Actualizacion=0
      CASE ('bfgs','1')
       Actualizacion=1
-     CASE ('ms','murtagh-sargent','2')
+     CASE ('ms','murtagh-sargent','sr1','2')
       Actualizacion=2
      CASE ('psb','powell','3')
       Actualizacion=3
@@ -230,7 +230,7 @@ SUBROUTINE LeerVariable(Lin)
     SELECT CASE (TRIM(Val))
      CASE ('gradiente','gradient','sd','steepest-descent','0')
       MetodoOptim=0
-     CASE ('gradiente-conjugado','cg','conjugated-gradient','1')
+     CASE ('gradiente-conjugado','cg','conjugate-gradient','1')
       MetodoOptim=1
      CASE ('newton','newton-raphson','quasi-newton','cuasi-newton','nr','qn', &
            '2')
@@ -428,12 +428,12 @@ SUBROUTINE LeerVariable(Lin)
     VarEnt(35)=.TRUE.
     CALL PasarMinusculas(Val)
     SELECT CASE (TRIM(Val))
-     CASE ('cubica','cubic','sc','0')
-      TipoMalla=0
-     CASE ('compacta','face-centered','fcc','1')
+     CASE ('cubica','cubic','sc','1')
       TipoMalla=1
-     CASE ('body-centered','bcc','2')
+     CASE ('compacta','face-centered','fcc','2')
       TipoMalla=2
+     CASE ('body-centered','bcc','3')
+      TipoMalla=3
      CASE DEFAULT
       CALL Mensaje('LeerVariable',35,.TRUE.)
     END SELECT
@@ -442,7 +442,7 @@ SUBROUTINE LeerVariable(Lin)
   ELSE IF (TRIM(Var) == TRIM(VarComp(36))) THEN
     VarEnt(36)=.TRUE.
     READ(Val,*) CorteRF
-    IF (CorteRF <= 0.0D0) CorteRF=HUGE(CorteRF)
+    IF (CorteRF <= 0.0D0) CorteRF=1.0D6
 
   !DistCargas
   ELSE IF (TRIM(Var) == TRIM(VarComp(37))) THEN
@@ -455,14 +455,14 @@ SUBROUTINE LeerVariable(Lin)
     VarEnt(38)=.TRUE.
     CALL PasarMinusculas(Val)
     SELECT CASE (TRIM(Val))
-     CASE ('normal','-1')
-      TipoReduccion=-1
-     CASE ('cubica','cubic','sc','0')
+     CASE ('normal','0')
       TipoReduccion=0
-     CASE ('compacta','face-centered','fcc','1')
+     CASE ('cubica','cubic','sc','1')
       TipoReduccion=1
-     CASE ('body-centered','bcc','2')
+     CASE ('compacta','face-centered','fcc','2')
       TipoReduccion=2
+     CASE ('body-centered','bcc','3')
+      TipoReduccion=3
      CASE DEFAULT
       CALL Mensaje('LeerVariable',35,.TRUE.)
     END SELECT
@@ -481,7 +481,7 @@ SUBROUTINE LeerVariable(Lin)
   ELSE IF (TRIM(Var) == TRIM(VarComp(41))) THEN
     VarEnt(41)=.TRUE.
     READ(Val,*) MaxIter
-    IF (MaxIter < 0) MaxIter=0
+    IF (MaxIter < 1) MaxIter=1
 
   !InicioVacio
   ELSE IF (TRIM(Var) == TRIM(VarComp(42))) THEN
@@ -556,14 +556,14 @@ SUBROUTINE ValoresDefecto
   IF (.NOT. VarEnt(32)) DistMalla=0.5D0
   IF (.NOT. VarEnt(33)) FactorMalla=0.75D0
   IF (.NOT. VarEnt(34)) TipoCavidad=0
-  IF (.NOT. VarEnt(35)) TipoMalla=0
-  IF (.NOT. VarEnt(36)) CorteRF=HUGE(CorteRF)
+  IF (.NOT. VarEnt(35)) TipoMalla=1
+  IF (.NOT. VarEnt(36)) CorteRF=1.0D6
   IF (.NOT. VarEnt(37)) DistCargas=1.0D0
-  IF (.NOT. VarEnt(38)) TipoReduccion=-1
+  IF (.NOT. VarEnt(38)) TipoReduccion=0
   IF (.NOT. VarEnt(39)) SalidaMM='output.mm'
   IF (.NOT. VarEnt(40)) SalidaOpt='optim'
-  IF (.NOT. VarEnt(41)) MaxIter=0
-  IF (.NOT. VarEnt(42)) InicioVacio=.TRUE.
+  IF (.NOT. VarEnt(41)) MaxIter=1
+  IF (.NOT. VarEnt(42)) InicioVacio=.FALSE.
   IF (.NOT. VarEnt(43)) Inicio=1
   IF (.NOT. VarEnt(44)) TrayectoriaMM='traj.dcd'
 
@@ -612,8 +612,8 @@ END SUBROUTINE ValoresDefecto
 !-------------------------------------------------------------------------------
 ! Escribe los valores de todas las variables
 !-------------------------------------------------------------------------------
-! Etiqueta:
-! Valor:
+! Etiqueta: Prefijo que se añade si la variable no se ha definido
+! Valor:    El valor que se imprime para cada variable
 !-------------------------------------------------------------------------------
 SUBROUTINE EscribirValores
   USE Parametros
@@ -733,13 +733,13 @@ SUBROUTINE EscribirValores
 
   ETIQUETA(38)
   SELECT CASE (TipoReduccion)
-   CASE (-1)
-    Valor=Textos(74)
    CASE (0)
-    Valor=Textos(71)
+    Valor=Textos(74)
    CASE (1)
-    Valor=Textos(72)
+    Valor=Textos(71)
    CASE (2)
+    Valor=Textos(72)
+   CASE (3)
     Valor=Textos(73)
   END SELECT
   WRITE(6,100) Etiqueta, TRIM(Variables(38)), TRIM(ADJUSTL(Valor))
@@ -781,11 +781,11 @@ SUBROUTINE EscribirValores
 
   ETIQUETA(35)
   SELECT CASE (TipoMalla)
-   CASE (0)
-    Valor=Textos(71)
    CASE (1)
-    Valor=Textos(72)
+    Valor=Textos(71)
    CASE (2)
+    Valor=Textos(72)
+   CASE (3)
     Valor=Textos(73)
   END SELECT
   WRITE(6,100) Etiqueta, TRIM(Variables(35)), TRIM(ADJUSTL(Valor))

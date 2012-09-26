@@ -62,15 +62,15 @@ SUBROUTINE MallaMolecula(Mol,MallaMol)
   !Se escoge la distancia de la red cúbica base, según el tipo de malla
   !Todas las mallas están basadas en una red cúbica subyacente
   SELECT CASE (TipoMalla)
-   !Malla cúbica compacta (centrada en las caras)
+   !Malla cúbica simple
    CASE (1)
+    Dist=DistMalla
+   !Malla cúbica compacta (centrada en las caras)
+   CASE (2)
     Dist=DistMalla/SQRT(2.0D0)
    !Malla cúbica centrada en el cuerpo
-   CASE (2)
+   CASE (3)
     Dist=DistMalla/SQRT(3.0D0)
-   !Malla cúbica simple
-   CASE DEFAULT
-    Dist=DistMalla
   END SELECT
 
   !Se calculan los índices mínimos y máximos
@@ -90,7 +90,7 @@ SUBROUTINE MallaMolecula(Mol,MallaMol)
     DO j=Lim(2,1),Lim(2,2)
       !Se salta el punto si no corresponde al tipo de malla
       SELECT CASE (TipoMalla)
-       CASE (2)
+       CASE (3)
         IF (MODULO(j,2) /= MODULO(i,2)) CYCLE
        CASE DEFAULT
       END SELECT
@@ -100,11 +100,11 @@ SUBROUTINE MallaMolecula(Mol,MallaMol)
         SELECT CASE (TipoMalla)
          !En una red cúbica compacta sólo son puntos de la red los nodos de la
          !red cúbica base que tienen índices tales que i+j+k=0 (mod 2)
-         CASE (1)
+         CASE (2)
           IF (MODULO(i+j+k,2) /= 0) CYCLE
          !En una red cúbica centrada en el cuerpo sólo son puntos de la red los
          !nodos de la red cúbica base tales que i=j=k (mod 2)
-         CASE (2)
+         CASE (3)
           IF (MODULO(k,2) /= MODULO(i,2)) CYCLE
          CASE DEFAULT
         END SELECT

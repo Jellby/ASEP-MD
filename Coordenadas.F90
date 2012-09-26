@@ -300,9 +300,15 @@ SUBROUTINE CoordenadasInternas(Mol)
   !Se asignan todas las coordenadas
   i=COUNT(Enlaces(:,:) /= 0)/2
   IF (ALLOCATED(DefCoord)) DEALLOCATE(DefCoord)
-  ALLOCATE(DefCoord(i+m+n,4))
+  ALLOCATE(DefCoord(6+i+m+n,4))
   DefCoord(:,:)=0
-  k=1
+  DefCoord(1,4)=1
+  DefCoord(2,4)=2
+  DefCoord(3,4)=3
+  DefCoord(4,3)=1
+  DefCoord(5,3)=2
+  DefCoord(6,3)=3
+  k=7
   !Enlaces
   DO i=1,Num
     DO j=i+1,Num
@@ -358,7 +364,7 @@ END SUBROUTINE CoordenadasInternas
 ! MatB,MatAux:             Matrices auxiliares para la inversión
 ! Diag:                    Valores singulares de B
 ! a,b,c,d,a1,a2,...,d1,d2: Variables auxiliares
-! i,j:                     Contadores
+! i,j,k,l                  Contadores
 !-------------------------------------------------------------------------------
 SUBROUTINE ConvertirCoordenadas(Coord,Deriv)
   USE Utilidades
@@ -373,7 +379,7 @@ SUBROUTINE ConvertirCoordenadas(Coord,Deriv)
   DOUBLE PRECISION, DIMENSION(3) :: Vec1,Vec2,Vec3,Vec4,Vec13,Vec23
   DOUBLE PRECISION :: Dist1,Dist2,Dist3,Cos1,Cos2,Sen1,Sen2
   DOUBLE PRECISION, PARAMETER :: Preci=1.0D0-1.0D-4
-  INTEGER :: Num1,Num2,i,j,a,b,c,d,a1,a2,b1,b2,c1,c2,d1,d2
+  INTEGER :: Num1,Num2,i,j,k,l,a,b,c,d,a1,a2,b1,b2,c1,c2,d1,d2
 
   Num1=SIZE(DefCoord,1)
   Num2=SIZE(Coord,1)
@@ -397,9 +403,52 @@ SUBROUTINE ConvertirCoordenadas(Coord,Deriv)
     c=DefCoord(i,3); c1=3*c-2; c2=3*c
     d=DefCoord(i,4); d1=3*d-2; d2=3*d
     IF (a == 0) THEN
-      !Coordenadas cartesianas ponderadas
-      Geometria(i)=Coord(i)*Masa(i)
-      MatrizB(i,i)=Masa(i)
+      IF (d /= 0) THEN
+        !Traslación (centro geométrico, funciona mejor que el centro de masas)
+        Geometria(i)=0.0D0
+        DO j=1,SIZE(Coord,1),3
+          Geometria(i)=Geometria(i)+Coord(j+d-1)
+          MatrizB(i,j+d-1)=1.0D0
+        END DO
+        Geometria(i)=Geometria(i)*3.0D0/Num2
+        MatrizB(i,:)=MatrizB(i,:)*3.0D0/Num2
+        !Geometria(i)=Geometria(i)*3.0D0/SUM(Masa(:)*Masa(:))
+        !MatrizB(i,:)=MatrizB(i,:)*3.0D0/SUM(Masa(:)*Masa(:))
+       ELSE IF (c /= 0) THEN
+        !Rotación (alrededor del centro geometrico)
+        k=MOD(c,3)+1
+        l=MOD(c+1,3)+1
+        Vec1(:)=0.0D0
+        DO j=1,SIZE(Coord,1),3
+          Vec1(k)=Vec1(k)+Coord(j+k-1)
+          Vec1(l)=Vec1(l)+Coord(j+l-1)
+        END DO
+        Vec1(:)=Vec1(:)*3.0D0/Num2
+        DO j=1,SIZE(Coord,1),3
+          Vec2(k)=Coord(j+k-1)-Vec1(k)
+          Vec2(l)=Coord(j+l-1)-Vec1(l)
+          Vec2(c)=Vec2(k)**2+Vec2(l)**2
+          IF (Vec2(c) > 1.0D-4) THEN
+            MatrizB(i,j+k-1)=Vec2(l)/Vec2(c)
+            MatrizB(i,j+l-1)=-Vec2(k)/Vec2(c)
+            IF (Deriv > 1) THEN
+              Der(i,j+k-1,j+k-1)=-2.0D0*Vec2(k)*Vec2(l)/(Vec2(c)**2)
+              Der(i,j+l-1,j+l-1)=2.0D0*Vec2(k)*Vec2(l)/(Vec2(c)**2)
+              Der(i,j+k-1,j+l-1)=(Vec2(k)**2-Vec2(l)**2)/(Vec2(c)**2)
+              Der(i,j+l-1,j+k-1)=Der(i,j+k-1,j+l-1)
+            END IF
+          END IF
+        END DO
+        Geometria(i)=0.0D0
+        !MatrizB(i,:)=MatrizB(i,:)*3.0D0/Num2
+        !Der(i,:,:)=Der(i,:,:)*3.0D0/Num2
+        !MatrizB(i,:)=MatrizB(i,:)*(1.0D0-3.0D0/Num2-1.0D0)
+        !Der(i,:,:)=Der(i,:,:)*(1.0D0-3.0D0/Num2-1.0D0)
+       ELSE
+        !Coordenadas cartesianas ponderadas
+        Geometria(i)=Coord(i)*Masa(i)
+        MatrizB(i,i)=Masa(i)
+      END IF
     ELSE IF (a < 0) THEN
       !Combinación lineal de coordenadas internas
       a=-a
@@ -411,6 +460,10 @@ SUBROUTINE ConvertirCoordenadas(Coord,Deriv)
         MatrizB(i,:)=MatrizB(i,:)+Combinacion(a,j)*MatrizB(j,:)
         IF (Deriv > 1) Der(i,:,:)=Der(i,:,:)+Combinacion(a,j)*Der(j,:,:)
       END DO
+    ELSE IF (b == 0) THEN
+      !Coordenadas cartesianas de un átomo
+      Geometria(i)=Coord(a1+d-1)
+      MatrizB(i,a1+d-1)=1.0D0
     ELSE IF (c == 0) THEN
       !Conversión de distancias
       Dist1=Distancia(Coord(a1:a2),Coord(b1:b2))
@@ -659,26 +712,60 @@ SUBROUTINE ModificarCoordenadas(Fich)
     IF ((Signo /= '+') .AND. (Signo /= '-') .AND. (Signo /= '*')) &
        CALL Mensaje('ModificarCoordenadas',17,.TRUE.)
     Linea=ADJUSTL(Linea(2:))
-    IF (TRIM(Linea) /= '') READ(Linea,*) a
-    Linea=ADJUSTL(Linea(INDEX(Linea,' '):))
-    IF (TRIM(Linea) /= '') READ(Linea,*) b
-    Linea=ADJUSTL(Linea(INDEX(Linea,' '):))
-    IF (TRIM(Linea) /= '') READ(Linea,*) c
-    Linea=ADJUSTL(Linea(INDEX(Linea,' '):))
-    IF (TRIM(Linea) /= '') READ(Linea,*) d
-    IF ((a == 0) .OR. (b == 0)) CALL Mensaje('ModificarCoordenadas',17,.TRUE.)
-    IF (3*MAX(a,b,c,d) > SIZE(Masa,1)) &
-      CALL Mensaje('ModificarCoordenadas',18,.TRUE.)
 
-    !Se colocan los números en el orden adecuado
-    IF (c == 0) THEN
-      IF (b < a) CALL Intercambiar(a,b)
-    ELSE IF (d == 0) THEN
-      IF (c < a) CALL Intercambiar(a,c)
-    ELSE IF (d < a) THEN
-      CALL Intercambiar(a,d)
-      CALL Intercambiar(b,c)
-    END IF
+    SELECT CASE (Linea(1:1))
+     !Traslación (X/Y/Z)
+     CASE ('X')
+      d=1
+     CASE ('Y')
+      d=2
+     CASE ('Z')
+      d=3
+     !Rotación (RX/RY/RZ)
+     CASE ('R')
+      SELECT CASE (Linea(2:2))
+       CASE ('X')
+        c=1
+       CASE ('Y')
+        c=2
+       CASE ('Z')
+        c=3
+      END SELECT
+     !Cartesianas (CX/CY/CZ a)
+     CASE ('C')
+      SELECT CASE (Linea(2:2))
+       CASE ('X')
+        d=1
+       CASE ('Y')
+        d=2
+       CASE ('Z')
+        d=3
+      END SELECT
+      Linea=ADJUSTL(Linea(INDEX(Linea,' '):))
+      IF (TRIM(Linea) /= '') READ(Linea,*) a
+     !Distancias y ángulos (a b [c [d]])
+     CASE DEFAULT
+      IF (TRIM(Linea) /= '') READ(Linea,*) a
+      Linea=ADJUSTL(Linea(INDEX(Linea,' '):))
+      IF (TRIM(Linea) /= '') READ(Linea,*) b
+      Linea=ADJUSTL(Linea(INDEX(Linea,' '):))
+      IF (TRIM(Linea) /= '') READ(Linea,*) c
+      Linea=ADJUSTL(Linea(INDEX(Linea,' '):))
+      IF (TRIM(Linea) /= '') READ(Linea,*) d
+      IF ((a == 0) .OR. (b == 0)) CALL Mensaje('ModificarCoordenadas',17,.TRUE.)
+      IF (3*MAX(a,b,c,d) > SIZE(Masa,1)) &
+        CALL Mensaje('ModificarCoordenadas',18,.TRUE.)
+  
+      !Se colocan los números en el orden adecuado
+      IF (c == 0) THEN
+        IF (b < a) CALL Intercambiar(a,b)
+      ELSE IF (d == 0) THEN
+        IF (c < a) CALL Intercambiar(a,c)
+      ELSE IF (d < a) THEN
+        CALL Intercambiar(a,d)
+        CALL Intercambiar(b,c)
+      END IF
+    END SELECT
 
     !Se comprueba si la coordenada ya existe
     Rep=0
@@ -944,6 +1031,14 @@ SUBROUTINE ConvertirGradHess(Tipo,Grad,Hess)
                            InvB(:,:))
     END SELECT
     DEALLOCATE(MatK)
+
+    !Asegura que la matriz es simétrica
+    DO i=1,SIZE(Hessiana,1)
+      DO j=i+1,SIZE(Hessiana,2)
+        Hessiana(i,j)=0.5D0*(Hessiana(i,j)+Hessiana(j,i))
+        Hessiana(j,i)=Hessiana(i,j)
+      END DO
+    END DO
   END IF
 
 END SUBROUTINE ConvertirGradHess
@@ -966,7 +1061,7 @@ END SUBROUTINE ConvertirGradHess
 ! GeomCart:   Coordenadas cartesianas obtenidas
 ! Conv,Conv2: Criterios de convergencia
 ! MaxIt:      Número máximo de iteraciones para la conversión
-! c,d:        Átomos implicados (para tratar los ángulos)
+! b,c,d:      Átomos implicados (para tratar los ángulos)
 ! Error:      Variable para controlar los errores
 ! i,j:        Contadores
 !-------------------------------------------------------------------------------
@@ -983,16 +1078,20 @@ SUBROUTINE ConvertirIncremento(Paso,CoordCart,PasoCart)
   DOUBLE PRECISION, PARAMETER :: Conv=1.0D-6,Conv2=1.0D-12
   DOUBLE PRECISION :: Dist,DistAnt,Ini
   INTEGER, PARAMETER :: MaxIt=25
-  INTEGER :: i,j,c,d,Error
+  INTEGER :: i,j,b,c,d,Error
 
   !Se calculan las coordenadas finales deseadas
   Obj(:)=Geometria(:)+Paso(:)
   DO i=1,SIZE(DefCoord,1)
+    b=DefCoord(i,2)
     c=DefCoord(i,3)
     d=DefCoord(i,4)
     IF (Cong(i) == 1) Obj(i)=Geometria(i)
     IF (c == 0) CYCLE
-    IF (d == 0) THEN
+    IF (b == 0) THEN
+      !No hay valor asignado a las coordenadas de rotación
+      Obj(i)=0.0D0
+     ELSE IF (d == 0) THEN
       !Corrección de los ángulos
       Obj(i)=MOD(ABS(Obj(i)),2.0D0*Pi)
       IF (Obj(i) > Pi) Obj(i)=2.0D0*Pi-Obj(i)
@@ -1080,7 +1179,7 @@ END SUBROUTINE ConvertirIncremento
 ! Proy:     Proyector en el espacio de las coordenadas de trabajo
 ! P1,P2,P3: Matrices auxiliares para la proyección
 ! D:        Vector diagonal para la inversión
-! i:        Contador
+! i,j:      Contadores
 !-------------------------------------------------------------------------------
 SUBROUTINE Proyectar(Desp,Grad,Hess)
   USE Utilidades
@@ -1091,7 +1190,7 @@ SUBROUTINE Proyectar(Desp,Grad,Hess)
   DOUBLE PRECISION, DIMENSION(SIZE(DefCoord,1),SIZE(DefCoord,1)) :: Proy
   DOUBLE PRECISION, DIMENSION(SIZE(DefCoord,1),SIZE(DefCoord,1)) :: P1,P2,P3
   DOUBLE PRECISION, DIMENSION(SIZE(DefCoord,1)) :: D
-  INTEGER :: i
+  INTEGER :: i,j
 
   !Cálculo de la matriz de proyección
   Proy(:,:)=MATMUL(MatrizB(:,:),InvB(:,:))
@@ -1133,6 +1232,13 @@ SUBROUTINE Proyectar(Desp,Grad,Hess)
   !Proyección de la hessiana
   IF (PRESENT(Hess)) THEN
     Hess(:,:)=MATMUL(MATMUL(Proy(:,:),Hess(:,:)),Proy(:,:))
+    !Asegura que la matriz es simétrica
+    DO i=1,SIZE(Hess,1)
+      DO j=i+1,SIZE(Hess,2)
+        Hess(i,j)=0.5D0*(Hess(i,j)+Hess(j,i))
+        Hess(j,i)=Hess(i,j)
+      END DO
+    END DO
   END IF
 
 END SUBROUTINE Proyectar

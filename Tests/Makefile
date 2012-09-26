@@ -81,7 +81,7 @@ asep: asep.F90 $(ENT) $(MOLDY) $(MAL) $(CAV) $(EJEC) $(COMUN)
 asepmd: asepmd.F90 $(ENT) $(MOLDY) $(MAL) $(CAV) $(EJEC) $(OPT) $(COMUN)
 	$(COMP) $^ -o $@
 
-interp: interp.F90 $(MOLDY) $(COORD) $(COMUN)
+interp: interp.F90 $(MOLDY) $(GENMM) $(COORD) $(COMUN)
 	$(COMP) $^ -o $@
 
 elibre: elibre.F90 $(MOLDY) $(COMUN)

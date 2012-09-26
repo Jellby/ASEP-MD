@@ -36,7 +36,7 @@ PROGRAM prueba
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(EntradaMM))
+    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaGenerico(U)
     CLOSE(U)
 
