@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -59,7 +59,7 @@ PROGRAM prueba
 
    CASE (1) !Moldy
     UEnt=NuevaUnidad()
-    OPEN(UEnt,FILE=TRIM(EntradaMM),STATUS='OLD',ACTION='READ')
+    OPEN(UEnt,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
     CALL LeerControlMoldy(UEnt)
 
     U=NuevaUnidad()

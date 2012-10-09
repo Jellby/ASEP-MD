@@ -1,6 +1,6 @@
 !##############################################################################
-!# Copyright 2011 Ignacio Fdez. Galván, M. Luz Sánchez, Aurora Muñoz Losa,    #
-!#                M. Elena Martín, Manuel A. Aguilar                          #
+!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
 !#                                                                            #
@@ -22,6 +22,7 @@ PROGRAM prueba
   USE Parametros
   USE Entrada
   USE Sistema
+  USE GenericoMM
   USE Moldy
   USE DatosQMMM
   USE Configuraciones
@@ -32,22 +33,61 @@ PROGRAM prueba
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: ELibre
   DOUBLE PRECISION, DIMENSION(:,:,:,:), ALLOCATABLE :: IntAt
   LOGICAL, DIMENSION(:,:), ALLOCATABLE :: QInterTot
-  DOUBLE PRECISION :: KT,Beta
-  INTEGER :: U,i
+  CHARACTER(LEN=LLL) :: Linea
+  DOUBLE PRECISION :: KT,Beta,Temp=0.0D0
+  INTEGER :: U,i,Error
 
   CALL LeerEntrada(5)
 
-  U=NuevaUnidad()
-  OPEN(U,FILE=TRIM(EntradaMM),STATUS='OLD',ACTION='READ')
-  CALL LeerControlMoldy(U)
-  CLOSE(U)
-  KT=KBoltzmann*MoldyTemp
+!  SELECT CASE (ProgramaMM)
+!   CASE (0) !Genérico
+!    U=NuevaUnidad()
+!    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
+!    CALL LeerSistemaGenerico(U)
+!    CLOSE(U)
+!
+!   CASE (1) !Moldy
+!    U=NuevaUnidad()
+!    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
+!    CALL LeerControlMoldy(U)
+!    CLOSE(U)
+!
+!    U=NuevaUnidad()
+!    OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
+!    CALL LeerSistemaMoldy(U)
+!    CLOSE(U)
+!
+!    Temp=MoldyTemp
+!  END SELECT
+  SELECT CASE (ProgramaMM)
+   CASE (0) !Genérico
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(EntradaMM)//'.iter.0',ACTION='READ',STATUS='OLD')
+    CALL LeerSistemaGenerico(U)
+    CLOSE(U)
+   CASE (1) !Moldy
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(EntradaMM)//'.iter.0',ACTION='READ',STATUS='OLD')
+    CALL LeerControlMoldy(U)
+    CLOSE(U)
+    U=NuevaUnidad()
+    OPEN(U,FILE=TRIM(MoldyInput)//'.iter.0',ACTION='READ',STATUS='OLD')
+    CALL LeerSistemaMoldy(U)
+    CLOSE(U)
+    Temp=MoldyTemp
+  END SELECT
+
+  REWIND(5)
+  READ(5,'(A)',IOSTAT=Error) Linea
+  DO WHILE (Error == 0)
+    IF (INDEX(Linea,'#Temperatura') /= 0) READ(Linea(INDEX(Linea,'=')+1:),*) Temp
+    READ(5,'(A)',IOSTAT=Error) Linea
+  END DO
+
+  IF (Temp == 0.0D0) STOP "Temperatura = 0"
+  KT=KBoltzmann*Temp
   Beta=1.0D0/KT
 
-  U=NuevaUnidad()
-  OPEN(U,FILE=TRIM(MoldyInput)//'.iter.0',STATUS='OLD',ACTION='READ')
-  CALL LeerSistemaMoldy(U)
-  CLOSE(U)
   ALLOCATE(Sol(0:MaxIter,SIZE(Soluto)))
   ALLOCATE(IntAt(0:MaxIter,SIZE(InterAtom,1),SIZE(InterAtom,2),SIZE(InterAtom,3)))
   ALLOCATE(QInterTot(SIZE(QInter,1),SIZE(QInter,2)))
@@ -58,10 +98,18 @@ PROGRAM prueba
   DO i=0,MaxIter
     WRITE(Extension,*) i
     Extension='.iter.'//ADJUSTL(Extension)
-    U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(MoldyInput)//TRIM(Extension),STATUS='OLD',ACTION='READ')
-    CALL LeerSistemaMoldy(U)
-    CLOSE(U)
+    SELECT CASE (ProgramaMM)
+     CASE (0) !Generico
+      U=NuevaUnidad()
+      OPEN(U,FILE=TRIM(EntradaMM)//TRIM(Extension),ACTION='READ',STATUS='OLD')
+      CALL LeerSistemaGenerico(U)
+      CLOSE(U)
+     CASE (1) !Moldy
+      U=NuevaUnidad()
+      OPEN(U,FILE=TRIM(MoldyInput)//TRIM(Extension),ACTION='READ',STATUS='OLD')
+      CALL LeerSistemaMoldy(U)
+      CLOSE(U)
+    END SELECT
     Sol(i,:)=Soluto(:)
     IntAt(i,:,:,:)=InterAtom(:,:,:)
     QInterTot(:,:)=QInterTot(:,:) .OR. QInter(:,:)
@@ -72,7 +120,7 @@ PROGRAM prueba
     WRITE(Extension,*) i
     Extension='.iter.'//ADJUSTL(Extension)
     WRITE(6,*)
-    WRITE(6,'(A)') TRIM(MoldyInput)//TRIM(Extension)
+    WRITE(6,'(A)') TRIM(EntradaMM)//TRIM(Extension)
 
     CALL LeerConfs()
     CALL CalcularInteracciones(i)
@@ -111,6 +159,7 @@ SUBROUTINE LeerConfs()
 
   SELECT CASE (ProgramaMM)
    CASE (0) !Generico
+    CALL LeerConfigsGenerico(TRIM(TrayectoriaMM)//TRIM(Extension))
 
    CASE (1) !Moldy
     WRITE(Linea,100) &

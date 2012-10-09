@@ -173,9 +173,11 @@ SUBROUTINE LeerSistemaGenerico(Fich)
 END SUBROUTINE LeerSistemaGenerico
 
 !-------------------------------------------------------------------------------
+! Lee las configuraciones de un fichero DCD y las escribe en el fichero UConf
 !-------------------------------------------------------------------------------
+! Fich:    Nombre del fichero DCD que se lee (opcional)
 !-------------------------------------------------------------------------------
-SUBROUTINE LeerConfigsGenerico
+SUBROUTINE LeerConfigsGenerico(Fich)
   USE Configuraciones
   USE Parametros
   USE Sistema
@@ -184,6 +186,8 @@ SUBROUTINE LeerConfigsGenerico
   USE UtilidadesFis
   USE TipoAtomo
   IMPLICIT NONE
+  CHARACTER(LEN=LLL), INTENT(IN), OPTIONAL :: Fich
+
   TYPE(TipoDCD) :: Tray
   TYPE(Atomo), DIMENSION(:), ALLOCATABLE :: SolConf
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Pos
@@ -196,7 +200,12 @@ SUBROUTINE LeerConfigsGenerico
   Num=Num+MoleculasDisolvente*SIZE(Disolvente,1)
   Num=Num+MoleculasDisolvente2*SIZE(Disolvente2,1)
 
-  Tray%Nombre=TRIM(TrayectoriaMM)
+  !Si no se especifica ningún fichero se usa TrayectoriaMM
+  IF (PRESENT(Fich)) THEN
+    Tray%Nombre=TRIM(Fich)
+   ELSE
+    Tray%Nombre=TRIM(TrayectoriaMM)
+  END IF
   CALL AbrirDCD(Tray)
   IF (Tray%NAtomos /= Num) CALL Mensaje('LeerConfigsGenerico',39,.TRUE.)
   IF (Tray%Configs < NumConfig) CALL Mensaje('LeerConfigsGenerico',33,.TRUE.)
@@ -212,9 +221,11 @@ SUBROUTINE LeerConfigsGenerico
     CALL LeerDCD(Tray,Conf)
     Pos(:,:)=Tray%Coords(:,:)*AngstromAtomica
 
+    !Coordenadas del soluto en la configuración
     DO j=1,SIZE(Soluto,1)
       SolConf(j)%pos(:)=Pos(j,:)
     END DO
+    !Transforma la configuración para superponer el soluto
     CALL SuperponerMoleculas(Soluto,SolConf,Trans=Mover)
     Pos(:,:)=RotarCuaternion(Pos(:,:),Mover(1:4))
     Pos(:,:)=Pos(:,:)+SPREAD(Mover(5:7),DIM=1,NCOPIES=Num)

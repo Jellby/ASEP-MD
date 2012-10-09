@@ -5,3 +5,4 @@ NumConfig = 500
 MaxIter = 10
 CorteRF = 9999
 Dielectrica = 78.0
+#Temperatura = 300.0
