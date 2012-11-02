@@ -213,7 +213,7 @@ SUBROUTINE EjecutarMM(Ejec)
   !Se leen las configuraciones de la dinámica
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico
-    CALL LeerConfigsGenerico
+    CALL LeerConfigsGenerico()
 
    CASE (1) !Moldy
     WRITE(Linea,100) &

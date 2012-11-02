@@ -4,6 +4,8 @@
 # $2: output name
 # $3: bare extension
 
+if [ -z "$CPUS" ] ; then CPUS=1 ; fi
+
 export Project=test
 export WorkDir=$SCRDIR/$Project
 rm -rf $WorkDir

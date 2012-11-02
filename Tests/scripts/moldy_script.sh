@@ -5,6 +5,8 @@
 # $3: bare extension
 # $4: DCD trajectory file (unused)
 
+if [ -z "$CPUS" ] ; then CPUS=1 ; fi
+
 if [ $3 == "skip" ]; then
   exit
 fi

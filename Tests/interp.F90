@@ -161,6 +161,8 @@ PROGRAM prueba
       CLOSE(USal)
     END SELECT
 
+    IF (Sup) CALL SuperponerMoleculas(Previo,Soluto,Pesos)
+
     WRITE(6,*) SIZE(Soluto,1)
     WRITE(6,*)
     DO j=1,SIZE(Soluto,1)

@@ -196,7 +196,7 @@ for i in range(len(mol_geom)):
   print "  %i" % (sol_fin-sol_ini+1)
   for j in range(sol_ini,sol_fin+1):
     at = mol_geom[i][j]
-    print "  %2i %16s %3i %5.2f %10.6f %10.6f %10.6f %10.6f" % \
+    print "  %2i %16s %3i %7.4f %10.6f %10.6f %10.6f %10.6f" % \
     (at["id"], at["name"].ljust(16), at["atnum"], at["m"]/amu, at["x"]/angstrom, at["y"]/angstrom, at["z"]/angstrom, at["q"]/electron)
   break
 print
@@ -239,7 +239,7 @@ for i in range(len(params)):
     if ((i in sol_ids) and (j in nosol_ids) and params[i][j]): num += 1
 # Then print the values (in atomic units)
 print "Non-Bonded"
-print "  %s" % potential
+print "  %s" % potential.lower()
 print "  %i" % num
 if (potential.lower() == "lennard-jones"):
   for i in range(len(params)):

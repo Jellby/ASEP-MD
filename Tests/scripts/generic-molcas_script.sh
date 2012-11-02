@@ -4,6 +4,8 @@
 # $2: output name
 # $3: bare extension
 
+if [ -z "$CPUS" ] ; then CPUS=1 ; fi
+
 DIR=$(dirname $0)
 
 [ -n "$PBS_O_WORKDIR" ] || PBS_O_WORKDIR=$PWD

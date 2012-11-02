@@ -526,7 +526,7 @@ SUBROUTINE ValoresDefecto
   IF (.NOT. VarEnt(2)) EntradaMM='input.mm'
   IF (.NOT. VarEnt(3)) EntradaQM='input.qm'
   IF (.NOT. VarEnt(4)) ProgramaQM=1
-  IF (.NOT. VarEnt(5)) EjecutableQM='true'
+  IF (.NOT. VarEnt(5)) EjecutableQM='echo'
   IF (.NOT. VarEnt(6)) SalidaQM='output.qm'
   IF (.NOT. VarEnt(7)) CalcHessiana=0
   IF (.NOT. VarEnt(8)) Actualizacion=1
@@ -549,7 +549,7 @@ SUBROUTINE ValoresDefecto
   IF (.NOT. VarEnt(25)) FChkGaussian='fchk'
   IF (.NOT. VarEnt(26)) CargasExternas=''
   IF (.NOT. VarEnt(27)) ProgramaMM=1
-  IF (.NOT. VarEnt(28)) EjecutableMM='true' 
+  IF (.NOT. VarEnt(28)) EjecutableMM='echo' 
   IF (.NOT. VarEnt(29)) DumpextMoldy='dumpext' 
   IF (.NOT. VarEnt(30)) NumConfig=0
   IF (.NOT. VarEnt(31)) Dielectrica=1.0D0

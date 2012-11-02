@@ -39,39 +39,20 @@ PROGRAM prueba
 
   CALL LeerEntrada(5)
 
-!  SELECT CASE (ProgramaMM)
-!   CASE (0) !Genérico
-!    U=NuevaUnidad()
-!    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
-!    CALL LeerSistemaGenerico(U)
-!    CLOSE(U)
-!
-!   CASE (1) !Moldy
-!    U=NuevaUnidad()
-!    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
-!    CALL LeerControlMoldy(U)
-!    CLOSE(U)
-!
-!    U=NuevaUnidad()
-!    OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
-!    CALL LeerSistemaMoldy(U)
-!    CLOSE(U)
-!
-!    Temp=MoldyTemp
-!  END SELECT
+  Extension='.iter.0'
   SELECT CASE (ProgramaMM)
    CASE (0) !Genérico
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(EntradaMM)//'.iter.0',ACTION='READ',STATUS='OLD')
+    OPEN(U,FILE=TRIM(EntradaMM)//TRIM(Extension),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaGenerico(U)
     CLOSE(U)
    CASE (1) !Moldy
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(EntradaMM)//'.iter.0',ACTION='READ',STATUS='OLD')
+    OPEN(U,FILE=TRIM(EntradaMM)//TRIM(Extension),ACTION='READ',STATUS='OLD')
     CALL LeerControlMoldy(U)
     CLOSE(U)
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(MoldyInput)//'.iter.0',ACTION='READ',STATUS='OLD')
+    OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaMoldy(U)
     CLOSE(U)
     Temp=MoldyTemp
@@ -122,6 +103,7 @@ PROGRAM prueba
     WRITE(6,*)
     WRITE(6,'(A)') TRIM(EntradaMM)//TRIM(Extension)
 
+    Soluto(:)=Sol(i,:)
     CALL LeerConfs()
     CALL CalcularInteracciones(i)
   END DO
@@ -146,22 +128,22 @@ SUBROUTINE LeerConfs()
   CHARACTER (LEN=LLL) :: Linea,Dump
   INTEGER :: NumMol,NumCuat
 
-  Dump=TRIM(MoldyDump)//TRIM(Extension)//'-'
-
-  NumMol=0
-  NumCuat=0
-  NumMol=NumMol+MoleculasSoluto
-  IF (SIZE(Soluto,1) > 1) NumCuat=NumCuat+MoleculasSoluto
-  NumMol=NumMol+MoleculasDisolvente
-  IF (SIZE(Disolvente,1) > 1) NumCuat=NumCuat+MoleculasDisolvente
-  NumMol=NumMol+MoleculasDisolvente2
-  IF (SIZE(Disolvente2,1) > 1) NumCuat=NumCuat+MoleculasDisolvente2
-
   SELECT CASE (ProgramaMM)
    CASE (0) !Generico
     CALL LeerConfigsGenerico(TRIM(TrayectoriaMM)//TRIM(Extension))
 
    CASE (1) !Moldy
+    Dump=TRIM(MoldyDump)//TRIM(Extension)//'-'
+
+    NumMol=0
+    NumCuat=0
+    NumMol=NumMol+MoleculasSoluto
+    IF (SIZE(Soluto,1) > 1) NumCuat=NumCuat+MoleculasSoluto
+    NumMol=NumMol+MoleculasDisolvente
+    IF (SIZE(Disolvente,1) > 1) NumCuat=NumCuat+MoleculasDisolvente
+    NumMol=NumMol+MoleculasDisolvente2
+    IF (SIZE(Disolvente2,1) > 1) NumCuat=NumCuat+MoleculasDisolvente2
+
     WRITE(Linea,100) &
       TRIM(DumpextMoldy),NumMol,NumCuat,1,TRIM(Dump),'c.tmp'
     CALL SYSTEM(TRIM(Linea))
