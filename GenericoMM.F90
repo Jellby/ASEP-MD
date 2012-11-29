@@ -215,7 +215,7 @@ SUBROUTINE LeerConfigsGenerico(Fich)
 
   CALL AbrirUConf()
 
-  Paso=DBLE(Tray%Configs-1)/DBLE(NumConfig-1)
+  Paso=DBLE(Tray%Configs-1)/DBLE(MAX(NumConfig-1,1))
   DO i=1,NumConfig
     Conf=NINT((i-1)*Paso+1)
     CALL LeerDCD(Tray,Conf)

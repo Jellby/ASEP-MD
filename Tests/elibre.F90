@@ -48,11 +48,11 @@ PROGRAM prueba
     CLOSE(U)
    CASE (1) !Moldy
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(EntradaMM)//TRIM(Extension),ACTION='READ',STATUS='OLD')
+    OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
     CALL LeerControlMoldy(U)
     CLOSE(U)
     U=NuevaUnidad()
-    OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
+    OPEN(U,FILE=TRIM(MoldyInput)//TRIM(Extension),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaMoldy(U)
     CLOSE(U)
     Temp=MoldyTemp

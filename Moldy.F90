@@ -431,16 +431,17 @@ SUBROUTINE LeerConfigsMoldy(Centrar)
   CALL AbrirUConf()
 
   !Se escriben todas las configuraciones que se piden
-  Paso=DBLE(MoldyConfigs)/DBLE(NumConfig)
-  Conf=1
+  Paso=DBLE(MoldyConfigs-1)/DBLE(MAX(NumConfig-1,1))
+  Conf=0
   DO i=1,NumConfig
     !Se pasan configuraciones hasta llegar a la deseada
-    DO WHILE (Conf < NINT(i*Paso))
+    DO WHILE (Conf < NINT((i-1)*Paso+1)-1)
+      Conf=Conf+1
       READ(UL,*)
       READ(UC,*)
       READ(UQ,*)
-      Conf=Conf+1
     END DO
+    Conf=Conf+1
 
     !Se leen los datos
     READ(UL,*) Celda(:,:)

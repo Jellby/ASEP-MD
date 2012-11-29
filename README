@@ -8,5 +8,7 @@ named "bin".
 
 Run "make clean" to remove created files (optional).
 
+You may need to run "make" more than once in some cases.
+
 
 Contact: Ignacio Fdez. Galván (jellby@unex.es)
