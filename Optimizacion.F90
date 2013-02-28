@@ -1108,13 +1108,15 @@ SUBROUTINE HessianaInicial(Tipo)
 
    CASE (2) !Hessiana simple (unidad escalada)
     DO i=1,SIZE(Hessiana,1)
-      IF (DefCoord(i,4) > 0) THEN      !Diedros
-        !Si no es una traslación o coordenada cartesiana
-        IF (DefCoord(i,2) > 0) Hessiana(i,i)=0.1D0
-      ELSE IF (DefCoord(i,3) > 0) THEN !Ángulos
-        !Si no es una rotación
-        IF (DefCoord(i,2) > 0) Hessiana(i,i)=0.2D0
-      ELSE IF (DefCoord(i,2) > 0) THEN !Distancias
+      a=DefCoord(i,1)
+      b=DefCoord(i,2)
+      c=DefCoord(i,3)
+      d=DefCoord(i,4)
+      IF ((d > 0) .AND. (b > 0)) THEN       !Diedros
+        Hessiana(i,i)=0.1D0
+       ELSE IF ((c > 0) .AND. (b > 0)) THEN !Ángulos
+        Hessiana(i,i)=0.2D0
+       ELSE IF (b > 0) THEN                 !Distancias
         Hessiana(i,i)=0.5D0
        ELSE
         Hessiana(i,i)=1.0D0 !Hessiana unidad para coordenadas cartesianas
@@ -1128,13 +1130,11 @@ SUBROUTINE HessianaInicial(Tipo)
       b=DefCoord(i,2)
       c=DefCoord(i,3)
       d=DefCoord(i,4)
-      IF (d > 0) THEN      !Diedros
-        !Si no es una traslación o coordenada cartesiana
-        IF (b > 0) Hessiana(i,i)=KDie*Rho(a,b)*Rho(b,c)*Rho(c,d)
-      ELSE IF (c > 0) THEN !Ángulos
-        !Si no es una rotación
-        IF (b > 0) Hessiana(i,i)=KAng*Rho(a,b)*Rho(b,c)
-      ELSE IF (b > 0) THEN !Distancias
+      IF ((d > 0) .AND. (b > 0)) THEN       !Diedros
+        Hessiana(i,i)=KDie*Rho(a,b)*Rho(b,c)*Rho(c,d)
+       ELSE IF ((c > 0) .AND. (b > 0)) THEN !Ángulos
+        Hessiana(i,i)=KAng*Rho(a,b)*Rho(b,c)
+       ELSE IF (b > 0) THEN                 !Distancias
         Hessiana(i,i)=KDis*Rho(a,b)
        ELSE
         Hessiana(i,i)=1.0D0 !Hessiana unidad para coordenadas cartesianas

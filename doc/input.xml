@@ -1,0 +1,1114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="input_xhtml.xsl"?>
+
+<document>
+
+<title lang="en">ASEP/MD Input</title>
+<title lang="es">Entrada ASEP/MD</title>
+
+<description lang="en">
+The input file for ASEP/MD is mostly free format.
+It contains the names of the different input variables and their values, they are all case-insensitive (except for filenames).
+The names must match the language ASEP/MD has been compiled for, but the values can be written as any of the accepted words listed below, regardless of the language.
+</description>
+<description lang="es">
+El fichero de entrada de ASEP/MD tiene un formato prácticamente libre.
+Contiene los nombres de las distintas variables de entrada y sus valores; no se distinguen mayúsculas y minúsculas, excepto en nombres de ficheros.
+Los nombres de las variables deben coincidir con los correspondientes al idioma para el que se ha compilado ASEP/MD, pero los valores pueden siempre escribirse como cualquiera de las palabras aceptadas que se detallan más abajo, independientemente del idioma.
+</description>
+
+<description lang="en">
+The character <val>#</val> may be used to mark comments, as everything between a <val>#</val> and the end of line is ignored.
+Each non-blank line that is not a comment must contain the name of a variable, a <val>=</val> and the assigned value.
+Variables not appearing in the input file will be assigned default values, variables appearing several times will be assigned the value in the last instance.
+Quotes are are not needed for string values, and they are interpreted literally if present.
+Only the first ‘word’ after the <val>=</val> is taken as the value, so it is not possible to specify filenames with spaces.
+When a filename is needed, if there is nothing after the <val>=</val>, a blank value will be assigned, which in some cases disables the feature the filename would be used for.
+</description>
+<description lang="es">
+Puede usarse el carácter <val>#</val> para marcar comentarios, no se tendrá en cuenta cualquier cosa después de <val>#</val> y hasta el final de la línea.
+Toda línea que no esté en blanco y que no sea un comentario debe contener el nombre de una variable, un signo <val>=</val> y el valor asignado.
+A las variables que no aparezcan en la entrada se les asignará un valor predeterminado, a las que aparezcan varias veces se le asignará el último valor que aparezca.
+No se necesitan comillas para valores de texto, y se interpretarán de manera lineral si aparecen.
+Solo se tomará como valor para la variable la primera «palabra» después del signo <val>=</val>, por lo que no se pueden especificar nombres de fichero con espacios.
+Cuando se requiera un nombre de fichero, si no hay nada después del signo <val>=</val>, se asignará un valor en blanco, lo que en algunos casos desactiva la opción para la que se usaría el nombre de fichero.
+</description>
+
+<description lang="en">
+Below is a list of all valid variables with their meanings, default values and accepted values.
+</description>
+<description lang="es">
+A continuación se da una lista de todas las variables válidas y sus significados, valores predeterminados y valores aceptados.
+</description>
+
+<variable>
+  <name lang="en">ChargesType</name>
+  <name lang="es">TipoCargas</name>
+
+  <default>ESP</default>
+
+  <description lang="en">
+  Specifies which type of atomic charges for the solute will be used in MD simulations after a previous QM calculation has been done.
+  </description>
+  <description lang="es">
+  Especifica qué tipo de cargas atómicas del soluto se usará en las simulaciones de MD después de realizar un cálculo QM previo.
+  </description>
+
+  <value>
+    <option>Mulliken</option>
+    <option>0</option>
+    <description lang="en">Use Mulliken charges, not recommended.</description>
+    <description lang="es">Usar cargas de Mulliken, no recomendado.</description>
+  </value>
+  <value>
+    <option>ESP</option>
+    <option>QM</option>
+    <option>1</option>
+    <description lang="en">Use charges fitted to the electrostatic potential by the QM program. The input to the QM program should include appropriate instructions for these charges to be calculated. This is the default.</description>
+    <description lang="es">Usar cargas ajustadas al potencial electrostático por el programa QM. La entrada para el programa QM debe incluir las instrucciones adecuadas para que se calculen estas cargas. Este es el valor predeterminado.</description>
+  </value>
+  <value>
+    <option>potencial</option>
+    <option>potential</option>
+    <option>2</option>
+    <description lang="en">Calculate charges fitted to the electrostatic potential independently of the QM program. The electrostatic potential generated on the solvent charges positions will be used for the fitting. In a gas phase calculation (see <var>VacuumStart</var>) there are no solvent charges, so no new solute atomic charges will be calculated in this case.</description>
+    <description lang="es">Calcular cargas ajustadas al potencial electrostático independientemente del programa QM. Se usará para el ajuste el potencial electrostático generado sobre las posiciones donde se encuentran las cargas del disolvente. En un cálculo en vació (ver <var>InicioVacio</var>) no hay cargas del disolvente, por lo que no se calcularán nuevas cargas atómicas para el soluto en este caso.</description>
+  </value>
+  <value>
+    <option>externo</option>
+    <option>external</option>
+    <option>3</option>
+    <description lang="en">Read atomic charges from an external file, specified by <var>ChargesFile</var>. This is the default if <var>QMProgram</var> = <val>Molcas</val>.</description>
+    <description lang="es">Leer las cargas atómicas de un fichero externo, especificado por <var>FicheroCargas</var>. Este es el valor predeterminado si <var>ProgramaQM</var> = <val>Molcas</val>.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">MMInput</name>
+  <name lang="es">EntradaMM</name>
+
+  <default>input.mm</default>
+
+  <description lang="en">
+  Name of the file containing the system description.
+  If <var>MMProgram</var> = <val>Moldy</val>, this should be the ‘control’ file.
+  If <var>MMProgram</var> = <val>generic</val>, this will be a generic system file.
+  A new file will be created for each cycle of the ASEP/MD process, with the modified system, by appending <val>.cic.#</val> (<val>#</val> being the cycle number) to this filename.
+  </description>
+  <description lang="es">
+  Nombre del fichero que contiene la descripción del sistema.
+  Si <var>ProgramaMM</var> = <val>Moldy</val>, este debería ser el fichero de «control».
+  Si <var>ProgramaMM</var> = <val>generico</val>, este será un fichero de sistema genérico.
+  En cada ciclo del proceso ASEP/MD se creara un nuevo fichero con el sistema modificado, agregando <val>.cic.#</val> (donde <val>#</val> es el número de ciclo) como sufijo a este nombre fichero.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">QMInput</name>
+  <name lang="es">EntradaQM</name>
+
+  <default>input.qm</default>
+
+  <description lang="en">
+  Name of the template or input file for QM calculations.
+  If <var>QMProgram</var> = <val>generic</val>, this is simply the first part of the name of the generated input files.
+  In other cases, this is a template file from which the input files will be generated.
+  A new file will be created for each QM calculation by appending <val>.cic.#</val> (<val>#</val> being the cycle number) or <val>.cic.#.opt.#</val> (where the second <val>#</val> is the optimization iteration) to this filename.
+  </description>
+  <description lang="es">
+  Nombre del fichero de plantilla o de entrada para los cálculos QM.
+  Si <var>ProgramaMM</var> = <val>generico</val>, esta es solo la primera parte del nombre de los ficheros generados.
+  En otros casos, este es un fichero de plantilla a partir del cual se generarán los ficheros de entrada.
+  Para cada cálculo QM se creara un nuevo fichero agregando <val>.cic.#</val> (donde <val>#</val> es el número de ciclo) o <val>.cic.#.opt.#</val> (donde el segundo <val>#</val> es la iteración de optimización) como sufijo a este nombre fichero.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">QMProgram</name>
+  <name lang="es">ProgramaQM</name>
+
+  <default>Gaussian</default>
+
+  <description lang="en">
+  Software that will be used for the QM calculations.
+  </description>
+  <description lang="es">
+  Programa que se usará para los cálculos QM.
+  </description>
+
+  <value>
+    <option>generico</option>
+    <option>generic</option>
+    <option>0</option>
+    <description lang="en">No specific QM program assumed. Input files will be generated in a generic simple format and the output is expected in a similar format. The command specified by <var>QMExec</var> should take care of reading the generic input, running the calculation, and creating the generic output.</description>
+    <description lang="es">Ningún programa QM específico. Los ficheros de entrada se generarán con un formato genérico simple y se espera la salida en un formato similar. La orden especificado por <var>EjecutableQM</var> debe encargarse de leer la entrada genérica, ejecutar el cálculo y crear la salida genérica.</description>
+  </value>
+  <value>
+    <option>Gaussian</option>
+    <option>1</option>
+    <description lang="en">The QM calculations will be done with the Gaussian package. Input files will be generated in the format expected by Gaussian and the output will be read from a ‘formatted checkpoint’ file, specified by <var>GaussianFChk</var>, as well as from the normal Gaussian output.</description>
+    <description lang="es">Los cálculos QM serán realizados con el paquete Gaussian. Los ficheros de entrada se generarán con el formato aceptado por Gaussian y la salida se leerá de un fichero de «comprobación con formato», especificado por <var>FChkGaussian</var>, así como de la salida normal de Gaussian.</description>
+  </value>
+  <value>
+    <option>Molcas</option>
+    <option>2</option>
+    <description lang="en">The QM calculations will be done with the Molcas package. Input files will be generated in the format expected by Molcas and its output will be read.</description>
+    <description lang="es">Los cálculos QM serán realizados con el paquete Molcas. Los ficheros de entrada se generarán con el formato aceptado por Molcas y se leerá su salida.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">QMExec</name>
+  <name lang="es">EjecutableQM</name>
+
+  <default>echo</default>
+
+  <description lang="en">
+  Name of the command to run QM calculations.
+  If the file is not in the search path, it should include the full absolute or relative path.
+  The command will be run with three arguments: <val>$1</val> is the input file, <val>$2</val> is the output file, <val>$3</val> is the suffix that has been appended to the filenames (such that <val>$1</val> is <var>QMInput</var> with <val>$3</val> appended, and <val>$2</val> is <var>QMOutput</var> with <val>$3</val> appended).
+  The value of <val>$3</val> can be used to generate other filenames unique for each calculation.
+  </description>
+  <description lang="es">
+  Nombre de la orden que ejecuta los cálculos QM.
+  Si el fichero no está en la ruta de búsqueda, debe incluir la ruta absoluta o relativa completa.
+  La orden se ejecutará con tres argumentos: <val>$1</val> es el fichero de entrada, <val>$2</val> es el fichero de salida, <val>$3</val> es el sufijo que se ha agregado a los nombres de fichero (de manera que <val>$1</val> es <var>EntradaQM</var> con el sufijo <val>$3</val> y <val>$2</val> es <var>SalidaQM</var> con el sufijo <val>$3</val>).
+  El valor de <val>$3</val> puede usarse para generar otros nombres de fichero únicos para cada cálculo.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">QMOutput</name>
+  <name lang="es">SalidaQM</name>
+
+  <default>output.qm</default>
+
+  <description lang="en">
+  Name of the file from which the results of the QM calculation will be read.
+  The actual filename used will have <val>.cic.#</val> appended (<val>#</val> being the cycle number), or <val>.cic.#.opt.#</val> (where the second <val>#</val> is the optimization iteration) if there is geometry optimization.
+  </description>
+  <description lang="es">
+  Nombre del fichero de donde se leerán los resultados del cálculo QM.
+  El nombre real de fichero que se usará tendrá como sufijo <val>.cic.#</val> (donde <val>#</val> es el número de ciclo) o <val>.cic.#.opt.#</val> (donde el segundo <val>#</val> es la iteración de optimización) si se realiza optimización de geometría.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">HessianCalc</name>
+  <name lang="es">CalcHessiana</name>
+
+  <default>0</default>
+
+  <description lang="en">
+  Number of optimization iterations between exact calculations of the Hessian, a non-negative integer number.
+  If this number is <val>0</val>, the exact Hessian will never be calculated; if it is <val>1</val>, it will be calculated at every step; if it is <val>4</val>, it will be calculated every 4 steps, etc.
+  In the steps where the exact Hessian is not calculated, it is updated according to <var>Update</var>.
+  This variable is only used with second-order optimization methods (<var>OptimMethod</var> = <val>Newton</val>, <val>RFO</val>).
+  Whether the initial Hessian is exact or approximated is controlled by <var>InitialHess</var>.
+  </description>
+  <description lang="es">
+  Número de iteraciones de optimización entre cálculos de la hessiana exacta, un número entero no negativo.
+  Si este número es <val>0</val>, nunca se calculará la hessiana exacta; si es <val>1</val>, se calculará en cada paso; si es <val>4</val>, se calculará cada 4 pasos, etc.
+  En los pasos en los que no se calcula la hessiana exacta, se actualiza según el valor de <var>Actualizacion</var>.
+  Esta variable solo se usa con métodos de optimización de segundo orden (<var>MetodoOptim</var> = <val>Newton</val>, <val>RFO</val>).
+  La variable <var>HessianaInicial</var> controla si la hessiana inicial es exacta o aproximada.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">Update</name>
+  <name lang="es">Actualizacion</name>
+
+  <default>BFGS</default>
+
+  <description lang="en">
+  Update formula used for the Hessian matrix when it is not fully calculated.
+  This variable is only used with second-order optimization methods (<var>OptimMethod</var> = <val>Newton</val>, <val>RFO</val>).
+  </description>
+  <description lang="es">
+  Fórmula de actualización utilizada para la matriz hessiana cuando no se calcula de manera exacta.
+  Esta variable solo se usa con métodos de optimización de segundo orden (<var>MetodoOptim</var> = <val>Newton</val>, <val>RFO</val>).
+  </description>
+
+  <value>
+    <option>no</option>
+    <option>none</option>
+    <option>ninguna</option>
+    <option>0</option>
+    <description lang="en">No update is done, the previous Hessian is left unchanged.</description>
+    <description lang="es">Sin actualización, la hessiana anterior se mantiene sin cambios.</description>
+  </value>
+  <value>
+    <option>BFGS</option>
+    <option>1</option>
+    <description lang="en">Use the Broyden–Fletcher–Goldfarb–Shanno update formula. This is the default when a minimum energy point is searched.</description>
+    <description lang="es">Usar la fórmula de actualización de Broyden-Fletcher-Goldfarb-Shanno. Este es el valor predeterminado cuando se busca un mínimo de energía.</description>
+  </value>
+  <value>
+    <option>MS</option>
+    <option>Murtagh-Sargent</option>
+    <option>SR1</option>
+    <option>2</option>
+    <description lang="en">Use the Murtagh–Sargent or symmetric rank-one update formula.</description>
+    <description lang="es">Usar la fórmula de actualización de Murtagh-Sargent or simétrica de rango uno.</description>
+  </value>
+  <value>
+    <option>PSB</option>
+    <option>Powell</option>
+    <option>3</option>
+    <description lang="en">Use the Powell-symmetric-Broyden update formula. This is the default when a transition state point is searched.</description>
+    <description lang="es">Usar la fórmula de actualización simétrica de Powell-Broyden. Este es el valor predeterminado cuando se busca un estado de transición.</description>
+  </value>
+  <value>
+    <option>Bofill</option>
+    <option>4</option>
+    <description lang="en">Use the Bofill update formula, a linear combination of MS and PSB.</description>
+    <description lang="es">Usar la fórmula de actualización de Bofill, combinación lineal de MS y PSB.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">TransitionState</name>
+  <name lang="es">EstadoTransicion</name>
+
+  <default lang="en">no</default>
+  <default lang="es">no</default>
+
+  <description lang="en">
+  Whether or not to search for a transition state (first-order saddle point).
+  If a transition state search is requested, only <var>LinearSearch</var> = <val>no</val> is allowed, and only second-order optimization methods (<var>OptimMethod</var> = <val>Newton</val>, <val>RFO</val>) are possible.
+  </description>
+  <description lang="es">
+  Especifica si se busca o no un estado de transición (punto de ensilladura de primer orden).
+  Si se busca un estado de transición, solo se permite <var>BusquedaLineal</var> = <val>no</val>, y solo son posibles métodos de optimización de segundo orden (<var>MetodoOptim</var> = <val>Newton</val>, <val>RFO</val>).
+  </description>
+
+  <value>
+    <option>si</option>
+    <option>yes</option>
+    <option>1</option>
+    <description lang="en">The optimization algorithm tries to locate a first-order saddle point.</description>
+    <description lang="es">El algoritmo de optimización trata de encontrar un punto de ensilladura de primer orden.</description>
+  </value>
+  <value>
+    <option/>
+    <description lang="en">The optimization algorithm tries to locate a minimum energy point.</description>
+    <description lang="es">El algoritmo de optimización trata de encontrar un punto de mínima energía.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">OptimMethod</name>
+  <name lang="es">MetodoOptim</name>
+
+  <default>RFO</default>
+
+  <description lang="en">
+  Chooses the algorithm to use for the geometry optimization of the solute.
+  </description>
+  <description lang="es">
+  Escoge el algortimo que se usará para la optimización de la geometría del soluto.
+  </description>
+
+  <value>
+    <option>gradiente</option>
+    <option>gradient</option>
+    <option>SD</option>
+    <option>steepest-descent</option>
+    <option>0</option>
+    <description lang="en">Use the ‘steepest descent’ first-order method, following the direction of the gradient at every point. This method can only be used to locate minimum energy points.</description>
+    <description lang="es">Usar el método de primer orden de la «pendiente máxima», siguiendo la dirección del gradiente en cada punto. Este método solo puede usarse para buscar mínimos de energía.</description>
+  </value>
+  <value>
+    <option>gradiente-conjugado</option>
+    <option>CG</option>
+    <option>conjugate-gradient</option>
+    <option>1</option>
+    <description lang="en">Use the Fletcher–Reeves conjugate gradient method, a first-order method that uses only gradient information. This method can only be used to locate minimum energy points.</description>
+    <description lang="es">Usar el método de gradiente conjugado de Fletcher-Reeves, un método de primer orden que emplea solo la información del gradiente. Este método solo puede usarse para buscar mínimos de energía.</description>
+  </value>
+  <value>
+    <option>Newton</option>
+    <option>Newton-Raphson</option>
+    <option>quasi-Newton</option>
+    <option>cuasi-Newton</option>
+    <option>NR</option>
+    <option>QN</option>
+    <option>2</option>
+    <description lang="en">Use the Newton–Raphson method (or quasi-Newton, if the exact Hessian is not calculated), a second-order method.</description>
+    <description lang="es">Usar el método de Newton-Raphson (o cuasi-Newton, si no se calcula la hessiana exacta), un método de segundo orden.</description>
+  </value>
+  <value>
+    <option>RFO</option>
+    <option>PRFO</option>
+    <option>P-RFO</option>
+    <option>3</option>
+    <description lang="en">Use the rational function optimization method (or partitioned RFO in searching for a transition state). This is the default.</description>
+    <description lang="es">Usar el método de optimización de función racional (o RFO dividido si se busca un estado de transición). Este es el valor predeterminado.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">CoordinatesType</name>
+  <name lang="es">TipoCoordenadas</name>
+
+  <default lang="en">internal</default>
+  <default lang="es">internas</default>
+
+  <description lang="en">
+  Coordinates to use for the optimization of the solute geometry.
+  </description>
+  <description lang="es">
+  Coordenadas que se usarán para la optimización de geometría del soluto.
+  </description>
+
+  <value>
+    <option>cartesianas</option>
+    <option>cartesian</option>
+    <option>0</option>
+    <description lang="en">Use the <math>3n</math> Cartesian coordinates, where <math>n</math> is the number of atoms of the solute.</description>
+    <description lang="es">Usar las <math>3n</math> coordenadas cartesianas, donde <math>n</math> es el número de átomos del soluto.</description>
+  </value>
+  <value>
+    <option>ponderadas</option>
+    <option>mass-weighted</option>
+    <option>1</option>
+    <description lang="en">Use mass-weighted Cartesian coordinates, with each coordinate multiplied by <math latex="\sqrt{m}">√m</math>, where <math>m</math> is the mass of the corresponding atom.</description>
+    <description lang="es">Usar coordenadas cartesianas ponderadas, con cada coordenada cartesiana multiplicada por <math latex="\sqrt{m}">√m</math>, donde <math>m</math> es la masa del átomo correspondiente.</description>
+  </value>
+  <value>
+    <option>internas</option>
+    <option>internal</option>
+    <option>2</option>
+    <description lang="en">Use redundant internal coordinates, consisting in distances between two atoms, angles between three atoms and dihedrals between four atoms, to which translation and rotation the the whole molecule are added. The definition of the internal coordinates is automatic, but it can be modified through <var>AltCoordinates</var>.</description>
+    <description lang="es">Usar coordenadas internas redundantes, formadas por distancias entre dos átomos, ángulos entre tres átomos y diedros entre cuatro átomos, a las que se añade la traslación y rotación de la molécula completa. La definición de las coordenadas internas es automática, pero puede modificarse con <var>AltCoordenadas</var>.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">AltCoordinates</name>
+  <name lang="es">AltCoordenadas</name>
+
+  <default></default>
+
+  <description lang="en">
+  Name of the file listing the modifications to be applied to the internal coordinates definition.
+  Internal or Cartesian coordinates can be added, removed or frozen.
+  This is only used if <var>CoordinatesType</var> = <val>internal</val>.
+  An empty value (default) means no modification in done to the automatically generated coordinates.
+  </description>
+  <description lang="es">
+  Nombre del fichero donde aparecen las modificaciones que se aplican a la definición de coordenadas internas.
+  Pueden añadirse, eliminarse o congelarse coordenadas internas o cartesianas.
+  Esta opción solo se usa si <var>TipoCoordenadas</var> = <val>internas</val>.
+  Un valor en blanco (predeterminado) indica que no se hace ninguna modificación a las coordenadas generadas automáticamente.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">MaxIterOpt</name>
+  <name lang="es">MaxIterOpt</name>
+
+  <default>0</default>
+
+  <description lang="en">
+  Maximum number of iterations in the geometry optimization of the solute, a non-negative integer number.
+  If this value is <val>0</val>, no geometry optimization will be done, and only the solute atomic charges will change in the calculation.
+  If the optimization is not converged before this number of iterations is reached, it will be stopped, but the ASEP/MD calculation will continue normally.
+  Convergence criteria are given by <var>GradConvOpt</var>, <var>StepConvOpt</var> and <var>EnerConvOpt</var>.
+  </description>
+  <description lang="es">
+  Número máximo de iteraciones en la optimización de geometría del soluto, un número entero no negativo.
+  Si este valor es <val>0</val>, no se realiza optimización de geometría y unicamente se modificarán las cargas atómicas del soluto durante el cálculo.
+  Si la optimización no converge antes de alcanzar este número de iteraciones, se detendrá, pero el cálculo ASEP/MD continuará con normalidad.
+  Los criterios de convergencia vienen dados por <var>ConvGradOpt</var>, <var>ConvPasoOpt</var> y <var>ConvEnerOpt</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">GradConvOpt</name>
+  <name lang="es">ConvGradOpt</name>
+
+  <default>3.0<exp>-4</exp></default>
+
+  <description lang="en">
+  Convergence criterion for the total gradient of the solute during optimization (in <math latex="E_{\text{h}}/a_0">E_h/a_0</math>), a non-negative number.
+  The criterion is satisfied if the maximum component of the projected Cartesian gradient (in absolute value) is lower than this value.
+  Optimization is considered converged if <var>GradConvOpt</var> and either <var>EnerConvOpt</var> or <var>StepConvOpt</var> are satisfied.
+  </description>
+  <description lang="es">
+  Criterio de convergencia para el gradiente total del soluto durante la optimización (en <math latex="E_{\text{h}}/a_0">E_h/a_0</math>), un número no negativo.
+  El criterio se satisface si la máxima componente del gradiente cartesiano proyectado (en valor absoluto) es menor que este valor.
+  La optimización se considera convergida si se satisface <var>ConvGradOpt</var> y uno de <var>ConvEnerOpt</var> y <var>ConvPasoOpt</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">EnerConvOpt</name>
+  <name lang="es">ConvEnerOpt</name>
+
+  <default>1.0<exp>-6</exp></default>
+
+  <description lang="en">
+  Convergence criterion for the total energy of the solute during optimization (in <math latex="E_{\text{h}}">E_h</math>), a non-negative number.
+  The criterion is satisfied if the energy difference between the previous and current iterations (in absolute value) is lower than this value.
+  Optimization is considered converged if <var>GradConvOpt</var> and either <var>EnerConvOpt</var> or <var>StepConvOpt</var> are satisfied.
+  </description>
+  <description lang="es">
+  Criterio de convergencia para la energía total del soluto durante la optimización (en <math latex="E_{\text{h}}">E_h</math>), un número no negativo.
+  El criterio se satisface si la diferencia de energía entre la iteración anterior y la actual (en valor absoluto) es menor que este valor.
+  La optimización se considera convergida si se satisface <var>ConvGradOpt</var> y uno de <var>ConvEnerOpt</var> y <var>ConvPasoOpt</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">StepConvOpt</name>
+  <name lang="es">ConvPasoOpt</name>
+
+  <default>3.0<exp>-4</exp></default>
+
+  <description lang="en">
+  Convergence criterion for the solute geometry change during optimization (in <math>a_0</math>), a non-negative number.
+  The criterion is satisfied if the maximum Cartesian component of the estimated geometry change (in absolute value) is lower than this value.
+  Optimization is considered converged if <var>GradConvOpt</var> and either <var>EnerConvOpt</var> or <var>StepConvOpt</var> are satisfied.
+  </description>
+  <description lang="es">
+  Criterio de convergencia para el cambio de geometría del soluto durante la optimización (en <math>a_0</math>), un número no negativo.
+  El criterio se satisface si la máxima componente cartesiana del cambio estimado de geometría (en valor absoluto) es menor que este valor.
+  La optimización se considera convergida si se satisface <var>ConvGradOpt</var> y uno de <var>ConvEnerOpt</var> y <var>ConvPasoOpt</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">MaxStepOpt</name>
+  <name lang="es">MaxPasoOpt</name>
+
+  <default>0.3</default>
+
+  <description lang="en">
+  Maximum geometry change (measured as the norm of the vector) in each iteration of the optimization, in the work coordinates chosen by <var>CoordinatesType</var> (in <math>a_0</math>, rad, <math latex="m_{\text{e}}">m_e</math>).
+  If <var>CoordinatesType</var> = <val>mass-weighted</val> the default is <val>3.0</val>.
+  </description>
+  <description lang="es">
+  Máximo cambio de geometría (medido como la norma del vector) en cada iteración de optimización, en las coordenadas de trabajo dadas por <var>TipoCoordenadas</var> (en <math>a_0</math>, rad, <math latex="m_{\text{e}}">m_e</math>).
+  Si <var>TipoCoordenadas</var> = <val>ponderadas</val> el valor predeterminado es <val>3.0</val>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">InitialHess</name>
+  <name lang="es">HessInicial</name>
+
+  <default lang="en">simple</default>
+  <default lang="es">simple</default>
+
+  <description lang="en">
+  Specifies the initial Hessian matrix for the geometry optimization.
+  This setting is independent of <var>HessianCalc</var>.
+  Only used with second-order optimization methods (<var>OptimMethod</var> = <val>Newton</val>, <val>RFO</val>).
+  </description>
+  <description lang="es">
+  Especifica el tipo de matriz hessiana inicial que se usará para la optimización de geometría
+  Esta variable es independiente de <var>CalcHessiana</var>.
+  Solo se usa con métodos de optimización de segundo orden (<var>MetodoOptim</var> = <val>Newton</val>, <val>RFO</val>).
+  </description>
+
+  <value>
+    <option>exacta</option>
+    <option>exact</option>
+    <option>0</option>
+    <description lang="en">An exact Hessian calculation will be requested to the QM program. This is the default in transition state searches.</description>
+    <description lang="es">Se realiza un cálculo exacto de la hessiana con el programa QM. Este es el valor predeterminado para búsquedas de estados de transición.</description>
+  </value>
+  <value>
+    <option>unidad</option>
+    <option>unit</option>
+    <option>1</option>
+    <description lang="en">The unit matrix will be used in the work coordinates chosen by <var>CoordinatesType</var>.</description>
+    <description lang="es">Se usa la matriz unidad en las coordenadas de trabajo determinadas por <var>TipoCoordenadas</var>.</description>
+  </value>
+  <value>
+    <option>simple</option>
+    <option>2</option>
+    <description lang="en">A simple diagonal matrix will be used in the work coordinates chosen by <var>CoordinatesType</var>. The diagonal values depend on the type of coordinate they belong to. It is equivalent to <val>unit</val> if <var>CoordinatesType</var> = <val>Cartesian</val>. This is the default in minimum energy point searches.</description>
+    <description lang="es">Se usa una matriz diagonal sencilla en las coordenadas de trabajo determinadas por <var>TipoCoordenadas</var>. Los valores de la diagonal dependen del tipo de coordenadas que se usen. Es equivalente a <val>unidad</val> si <var>TipoCoordenadas</var> = <val>Cartesianas</val>. Este es el valor predeterminado para búsquedas de mínimos de energía.</description>
+  </value>
+  <value>
+    <option>modelo</option>
+    <option>model</option>
+    <option>3</option>
+    <description lang="en">A model Hessian assuming independent harmonic potentials for each coordinate will be used in the work coordinates chosen by <var>CoordinatesType</var>. It is equivalent to <val>unit</val> if <var>CoordinatesType</var> = <val>Cartesian</val>.</description>
+    <description lang="es">Se usa una hessiana modelo que supone potenciales armónicos independientes para cada coordenada, en las coordenadas de trabajo determinadas por <var>TipoCoordenadas</var>. Es equivalente a <val>unidad</val> si <var>TipoCoordenadas</var> = <val>Cartesianas</val>.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">LinearSearch</name>
+  <name lang="es">BusquedaLineal</name>
+
+  <default lang="en">no</default>
+  <default lang="es">no</default>
+
+  <description lang="en">
+  Type of linear search (if any) to perform in geometry optimizations.
+  No linear search is allowed if <var>TransitionState</var> = <val>yes</val>.
+  </description>
+  <description lang="es">
+  Tipo de búsqueda lineal que se realizará durante la optimización de geometría.
+  No se permite búsqueda lineal si <var>EstadoTransicion</var> = <val>si</val>.
+  </description>
+
+  <value>
+    <option>no</option>
+    <option>ninguna</option>
+    <option>none</option>
+    <option>0</option>
+    <description lang="en">No linear search is done, the predicted point is used as the next geometry. This is the default with second-order optimization methods (<var>OptimMethod</var> = <val>Newton</val>, <val>RFO</val>).</description>
+    <description lang="es">No se realiza búsqueda lineal, el punto predicho se usa como siguiente geometría. Este es el valor predeterminado con métodos de optimización de segundo orden (<var>MetodoOptim</var> = <val>Newton</val>, <val>RFO</val>).</description>
+  </value>
+  <value>
+    <option>simple</option>
+    <option>1</option>
+    <description lang="en">The energy and derivatives at the current and predicted points are used to build an interpolating polynomial, the minimum of which is taken as the next geometry. This is the default with first-order optimization methods (<var>OptimMethod</var> = <val>SD</val>, <val>CG</val>).</description>
+    <description lang="es">La energía y sus derivadas en el punto actual y el predicho se usan para construir un polinomio interpolador, cuyo mínimo se toma como siguiente geometría. Este es el valor predeterminado con métodos de optimización de primer orden (<var>MetodoOptim</var> = <val>SD</val>, <val>CG</val>).</description>
+  </value>
+  <value>
+    <option>completa</option>
+    <option>full</option>
+    <option>2</option>
+    <description lang="en">A full linear search is done in the direction given by the predicted point. The point with mimimum energy in this direction is taken as the next geometry.</description>
+    <description lang="es">Se realiza una búsqueda lineal completa en la dirección dada por el punto predicho. El punto de mínima energía en esta dirección se toma como siguiente geometría.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">ChargesFile</name>
+  <name lang="es">FicheroCargas</name>
+
+  <default></default>
+
+  <description lang="en">
+  Name of the file containing the atomic charges for the solute after each QM calculation, only used (and needed) if <var>ChargesType</var> = <val>external</val>.
+  The command <var>QMExec</var> should take care of generating this file after each calculation.
+  </description>
+  <description lang="es">
+  Nombre del fichero que contiene las cargas atómicas del soluto después de cada cálculo QM, solo se usa (y es necesario) si <var>TipoCargas</var> = <val>externo</val>.
+  La orden <var>EjecutableQM</var> debe encargarse de generar este fichero después de cada cálculo.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">CavityRadius</name>
+  <name lang="es">RadioCavidad</name>
+
+  <default>9.0</default>
+
+  <description lang="en">
+  Defines the size of the volume whose shape is specified by <var>CavityType</var>, a non-negative number.
+  If <var>CavityType</var> = <val>spherical</val>, <val>constant</val>, this value sets the radius of the spheres, in <math>a_0</math>.
+  If <var>CavityType</var> = <val>proportional</val>, this value sets the factor by which the Van der Waals radii are multiplied (the default is <val>4.5</val> in this case).
+  </description>
+  <description lang="es">
+  Define el tamaño del volumen cuya forma viene especificada por <var>TipoCavidad</var>, un número no negativo.
+  Si <var>TipoCavidad</var> = <val>esferica</val>, <val>constante</val>, este valor establece el radio de las esferas, en <math>a_0</math>.
+  Si <var>TipoCavidad</var> = <val>proporcional</val>, este valor establece el factor por el que se multiplican los radios de Van der Waals (el valor predeterminado en este caso es <val>4.5</val>).
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">Subdivisions</name>
+  <name lang="es">Subdivisiones</name>
+
+  <default>0</default>
+
+  <description lang="en">
+  Defines the number of fitted charges that will be placed outside the volume specified by <var>CavityType</var> and <var>CavityRadius</var>, an integer between 0 and 5.
+  This value determines the number of subdivision iterations to be performed on the initial polyhedron (a pentakis dodecahedron), by splitting each triangular face in 4 smaller triangles.
+  The total number of fitted charges is <math latex="90\cdot4^n+2">90·4^n+2</math>, where <math>n = </math><var>Subdivisions</var>.
+  </description>
+  <description lang="es">
+  Define el número de cargas ajustadas que se colocan en el exterior del volumen especificado por <var>TipoCavidad</var> y <var>RadioCavidad</var>, un entero entre 0 y 5.
+  Este valor determina el número de iteraciones de subdivisión que se realizarán sobre el poliedro inicial (un pentaquisdodecaedro), dividiendo cada cara triangular en 4 triángulos menores.
+  El número total de cargas ajustadas es <math latex="90\cdot4^n+2">90·4^n+2</math>, donde <math>n = </math><var>Subdivisiones</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">SolventRadius</name>
+  <name lang="es">RadioDisolvente</name>
+
+  <default>0.0</default>
+
+  <description lang="en">
+  In spite of its name, this variable is just a distance (in <math>a_0</math>) used for two purposes.
+  The volume shape defined by <var>CavityType</var> will have the corners rounded by spheres of this radius.
+  The fitted charges defined by <var>Subdivisions</var> will be placed in two shells at distances <var>SolventRadius</var> and <math latex="2\cdot{}">2·</math><var>SolventRadius</var> outside the above volume.
+  </description>
+  <description lang="es">
+  A pesar de su nombre, esta variable no es más que una distancia (en <math>a_0</math>) usada para dos fines.
+  Las esquinas y aristas del volumen definido por <var>TipoCavidad</var> se redondearán con esferas de este radio.
+  Las cargas ajustadas definidas por <var>Subdivisiones</var> se colocarán en dos capas en el exterior de dicho volumen, a distancias <var>RadioDisolvente</var> y <math latex="2\cdot{}">2·</math><var>RadioDisolvente</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">OptResume</name>
+  <name lang="es">OptContinuacion</name>
+
+  <default></default>
+
+  <description lang="en">
+  Name of the file where the information needed to resume a geometry optimization is read from.
+  The information is always written in a file named <val>optim.scratch</val>, and it is overwritten every iteration, so if you want to try to resume an optimization, it is better to copy the file with some other filename and assign this to <var>OptResume</var>.
+  </description>
+  <description lang="es">
+  Nombre del fichero de donde se lee la información necesaria para continuar una optimización de geometría.
+  Esta información se escribe siempre en un fichero llamado <val>optim.scratch</val>, y se sobrescribe en cada iteración, por lo que si se desea continuar una optimización es recomendable copiar el fichero con otro nombre y asignar este a <var>OptContinuacion</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">GaussianFChk</name>
+  <name lang="es">FChkGaussian</name>
+
+  <default>fchk</default>
+
+  <description lang="en">
+  Name of the Gaussian ‘formatted checkpoint’ file from which part of the results will be read.
+  This is only used if <var>QMProgram</var> = <val>Gaussian</val>.
+  The command specified by <var>QMExec</var> should take care of creating this file for each calculation.
+  The actual filename used will have <val>.cic.#</val> appended (<val>#</val> being the cycle number), or <val>.cic.#.opt.#</val> (where the second <val>#</val> is the optimization iteration) if there is geometry optimization; the string to append is passed as argument <val>$3</val> when running the <var>QMExec</var> command.
+  </description>
+  <description lang="es">
+  Nombre del fichero de «comprobación con formato» de Gaussian, de donde se leera parte de los resultados.
+  Esto solo se usa si <var>ProgramaQM</var> = <val>Gaussian</val>.
+  La orden especificada por <var>EjecutableQM</var> debe encargarse de crear este fichero para cada cálculo.
+  El nombre real de fichero que se usará tendrá como sufijo <val>.cic.#</val> (donde <val>#</val> es el número de ciclo) o <val>.cic.#.opt.#</val> (donde el segundo <val>#</val> es la iteración de optimización) si se realiza optimización de geometría; el sufijo que se añade se pasa como argumento <val>$3</val> al ejecutar la orden <var>EjecutableQM</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">ExternalCharges</name>
+  <name lang="es">CargasExternas</name>
+
+  <default></default>
+
+  <description lang="en">
+  Name of the file where the external charges representing the solvent will be written, to be used in the QM calculations.
+  A new file will be created for each QM calculation by appending <val>.cic.#</val> (<val>#</val> being the cycle number) or <val>.cic.#.opt.#</val> (where the second <val>#</val> is the optimization iteration) to this filename.
+  An empty value (default) means the external charges are written to the normal QM input file.
+  </description>
+  <description lang="es">
+  Nombre del fichero donde se escriben las cargas externas que representan el disolvente, para usarlo en el cálculo QM.
+  Para cada cálculo QM se creara un nuevo fichero agregando <val>.cic.#</val> (donde <val>#</val> es el número de ciclo) o <val>.cic.#.opt.#</val> (donde el segundo <val>#</val> es la iteración de optimización) como sufijo a este nombre fichero.
+  Un valor en blanco (predeterminado) indica que las cargas externas se escriben en el fichero de entrada QM normal.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">MMProgram</name>
+  <name lang="es">ProgramaMM</name>
+
+  <default>Moldy</default>
+
+  <description lang="en">
+  Software that will be used for the MD simulations.
+  </description>
+  <description lang="es">
+  Programa que se usará para las simulaciones de MD.
+  </description>
+
+  <value>
+    <option>generico</option>
+    <option>generic</option>
+    <option>0</option>
+    <description lang="en">No specific MD program assumed. Input files will be generated in a generic simple format and the configurations will be read from a DCD trajectory file specified by <var>MMTrajectory</var>. The command specified by <var>MMExec</var> should take care of reading the generic input, running the simulation, and creating the DCD file.</description>
+    <description lang="es">Ningún programa MD específico. Los ficheros de entrada se generarán con un formato genérico simple y las configuraciones se leen de un fichero de trayectoria DCD especificado por <var>TrayectoriaMM</var>. La orden especificado por <var>EjecutableMM</var> debe encargarse de leer la entrada genérica, ejecutar la simulación y crear el fichero DCD.</description>
+  </value>
+  <value>
+    <option>Moldy</option>
+    <option>1</option>
+    <description lang="en">The simulations will be run with Moldy. Input files will be generated in the format expected by Moldy and the configurations will be read with the ‘dumpext’ command specified by <var>DumpextMoldy</var>.</description>
+    <description lang="es">Las simulaciones se realizan con el programa Moldy. Los ficheros de entrada se generarán en el formato usado por Moldy y las configuraciones se leerán con la orden «dumpext» especificada por <var>DumpextMoldy</var>.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">MMExec</name>
+  <name lang="es">EjecutableMM</name>
+
+  <default>echo</default>
+
+  <description lang="en">
+  Name of the command to run MM calculations.
+  If the file is not in the search path, it should include the full absolute or relative path.
+  The command will be run with four arguments: <val>$1</val> is the input file, <val>$2</val> is the output file, <val>$3</val> is the suffix that has been appended to the filenames (such that <val>$1</val> is <var>MMInput</var> with <val>$3</val> appended, and <val>$2</val> is <var>MMOutput</var> with <val>$3</val> appended), <val>$4</val> is the name of the trajectory file from which the system configurations will be read (used only if <var>MMProgram</var> = <val>generic</val>).
+  The value of <val>$3</val> can be used to generate other filenames unique for each calculation.
+  </description>
+  <description lang="es">
+  Nombre de la orden para ejecutar los cálculos MM.
+  Si el fichero no está en la ruta de búsqueda, debe incluir la ruta absoluta o relativa completa.
+  La orden se ejecutará con cuatro argumentos: <val>$1</val> es el fichero de entrada, <val>$2</val> es el fichero de salida, <val>$3</val> es el sufijo que se ha agregado a los nombres de fichero (de manera que <val>$1</val> es <var>EntradaMM</var> con el sufijo <val>$3</val> y <val>$2</val> es <var>SalidaMM</var> con el sufijo <val>$3</val>), <val>$4</val> es el nombre del fichero de trayectoria de donde se leerán las configuraciones del sistema (usado solo si <var>ProgramaMM</var> = <val>generico</val>).
+  El valor de <val>$3</val> puede usarse para generar otros nombres de fichero únicos para cada cálculo.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">DumpextMoldy</name>
+  <name lang="es">DumpextMoldy</name>
+
+  <default>dumpext</default>
+
+  <description lang="en">
+  Name of the ‘dumpext’ command used to extract the system configurations from a Moldy run.
+  If the file is not in the search path, it should include the full absolute or relative path.
+  This is only used if <var>MMProgram</var> = <val>Moldy</val>.
+  </description>
+  <description lang="es">
+  Nombre de la orden «dumpext» para extraer las configuraciones del sistema de una simulación de Moldy.
+  Si el fichero no está en la ruta de búsqueda, debe incluir la ruta absoluta o relativa completa.
+  Esto solo se usa si <var>ProgramaMM</var> = <val>Moldy</val>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">ConfigNum</name>
+  <name lang="es">NumConfig</name>
+
+  <default>0</default>
+
+  <description lang="en">
+  Number of system configurations to include in the ASEP calculation, a non-negative integer number. 
+  This number cannot be larger than the total number of configurations available (contained in <var>MMTrajectory</var> or in the Moldy ‘dump’ files).
+  The configurations will be selected to span the total number of configurations available, distributed as evenly as possible.
+  </description>
+  <description lang="es">
+  Número de configuraciones del sistema que se incluirán en el cálculo del ASEP, un número no negativo.
+  Este número no puede ser mayor que el número total de configuraciones disponibles (contenidas en <var>TrayectoriaMM</var> o en los ficheros «dump» de Moldy).
+  Las configuraciones se seleccionarán para abarcar todas las configuraciones disponibles, distribuidas tan uniformemente como sea posible.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">Dielectric</name>
+  <name lang="es">Dielectrica</name>
+
+  <default>1.0</default>
+
+  <description lang="en">
+  Dielectric constant beyond the distance given by <var>RFCutoff</var> if the ‘reaction field’ correction is applied (see description of <var>RFCutoff</var>).
+  Only values of <val>1.0</val> or larger are allowed.
+  </description>
+  <description lang="es">
+  Constante dieléctrica a distancias mayores de <var>CorteRF</var> si se aplica la corrección de «campo de reacción» (ver descripción de <var>CorteRF</var>).
+  Solo se permiten valores iguales o mayores de <val>1.0</val>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">GridDist</name>
+  <name lang="es">DistMalla</name>
+
+  <default>0.5</default>
+
+  <description lang="en">
+  Separation between the grid points where the ASEP is calculated (in <math>a_0</math>), a non-negative number.
+  </description>
+  <description lang="es">
+  Separación entre los puntos de la red donde se calcula el ASEP (en <math>a_0</math>), un número no negativo.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">GridFactor</name>
+  <name lang="es">FactorMalla</name>
+
+  <default>0.75</default>
+
+  <description lang="en">
+  Factor by which Van der Waals (Bondi) radii of solute atoms will be multiplied when generating the grid points where the ASEP is calculated.
+  </description>
+  <description lang="es">
+  Factor por el que se multiplican los radios de Van der Waals (Bondi) para generar los puntos de red donde se calcula el ASEP.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">CavityType</name>
+  <name lang="es">TipoCavidad</name>
+
+  <default lang="en">spherical</default>
+  <default lang="es">esferica</default>
+
+  <description lang="en">
+  Specifies the shape of the volume within which the solvent charges will be kept explicitly.
+  Charges inside this volume will be later reduced according to <var>ReductionType</var>.
+  Charges outside this volume will be replaced by a fixed number of fitted charges, according to <var>Subdivisions</var>.
+  </description>
+  <description lang="es">
+  Especifica la forma del volumen dentro del cual se mantendrán explícitas las cargas del disolvente.
+  Las cargas dentro de este volumen se reducirán posteriormente según el valor de <var>ReduccionCargas</var>.
+  Las cargas fuera de este volumen se sustituiran por un número fijo de cargas ajustadas, según el valor de <var>Subdivisiones</var>.
+  </description>
+
+  <value>
+    <option>esferica</option>
+    <option>spherical</option>
+    <option>0</option>
+    <description lang="en">The volume is a sphere centered on the center of mass of the solute, with radius <var>CavityRadius</var>. This is the default</description>
+    <description lang="es">El volumen es una esfera centrada en el centro de masas del soluto, con radio <var>RadioCavidad</var>. Este es el valor predeterminado</description>
+  </value>
+  <value>
+    <option>proporcional</option>
+    <option>proportional</option>
+    <option>1</option>
+    <description lang="en">The volume is a union of spheres centered on each solute nucleus, with radius <var>CavityRadius</var> times the Van der Waals (Bondi) radius of each atom.</description>
+    <description lang="es">El volumen es la unión de esferas centradas en cada núcleo del soluto, con radio <var>RadioCavidad</var> multiplicado por el radio de Van der Waals (Bondi) de cada átomo.</description>
+  </value>
+  <value>
+    <option>constante</option>
+    <option>constant</option>
+    <option>2</option>
+    <description lang="en">The volume is a union of spheres centered on each solute nucleus, with radius <var>CavityRadius</var>.</description>
+    <description lang="es">El volumen es la unión de esferas centradas en cada núcleo del soluto, con radio <var>RadioCavidad</var>.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">GridType</name>
+  <name lang="es">TipoMalla</name>
+
+  <default>SC</default>
+
+  <description lang="en">
+  Type of lattice to use when generating the grid points where the ASEP is calculated.
+  </description>
+  <description lang="en">
+  Tipo de red para usar al generar los puntos de red donde se calcula el ASEP.
+  </description>
+
+  <value>
+    <option>cubica</option>
+    <option>cubic</option>
+    <option>SC</option>
+    <option>1</option>
+    <description lang="en">The grid is generated from a simple cubic lattice. This lattice is the default.</description>
+    <description lang="es">La red se genera a partir de una red cúbica simple. Esta es la red predeterminada.</description>
+  </value>
+  <value>
+    <option>compacta</option>
+    <option>face-centered</option>
+    <option>FCC</option>
+    <option>2</option>
+    <description lang="en">The grid is generated from a face-centered cubic lattice. This lattice minimizes the empty volume left by packing hard spheres.</description>
+    <description lang="es">La red se genera a partir de una red cúbica centrada en las caras. Esta red minimiza el espacio vacío al empaquetar esferas rígidas.</description>
+  </value>
+  <value>
+    <option>body-centered</option>
+    <option>BCC</option>
+    <option>3</option>
+    <description lang="en">The grid is generated from a body-centered cubic lattice. This lattice minimizes the maximum distance of any point in space to the closest node.</description>
+    <description lang="es">La red se genera a partir de una red cúbica centrada en el espacio. Esta red minimiza la máxima distancia de cualquier punto del espacio al nodo más cercano.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">RFCutoff</name>
+  <name lang="es">CorteRF</name>
+
+  <default>1.0<exp>6</exp></default>
+
+  <description lang="en">
+  Cut-off radius for the ‘reaction field’ correction to Coulomb interactions, in <math>a_0</math>.
+  The dielectric constant assumed beyond this distance is given by <var>Dielectric</var>.
+  The ‘reaction field’ correction is not applied if this value is <val>1000</val> or larger.
+  </description>
+  <description lang="es">
+  Radio de corte para la corrección de «campo de reacción» a las interacciones coulombianas, en <math>a_0</math>.
+  La constante dieléctrica supuesta a mayores distancias viene dada por <var>Dielectrica</var>.
+  La corrección de «campo de reacción» no se aplica si este valor es <val>1000</val> o mayor.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">ChargesDist</name>
+  <name lang="es">DistCargas</name>
+
+  <default>1.0</default>
+
+  <description lang="en">
+  Minimum distance allowed between the charges representing the solvent (in <math>a_0</math>), a non-negative number.
+  </description>
+  <description lang="es">
+  Mínima distancia permitida entre las cargas que representan el disolvente (en <math>a_0</math>), un número no negativo.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">ReductionType</name>
+  <name lang="es">TipoReduccion</name>
+
+  <default lang="en">normal</default>
+  <default lang="es">normal</default>
+
+  <description lang="en">
+  Method to use when reducing the total number of solvent charges, to ensure that the distance between any two charges is not smaller than <var>ChargesDist</var>.
+  The basic method (<val>normal</val>) simply combines the charges closer than the minimum distance in an arbitrary manner.
+  The other three methods work by dividing the space in cells, and combining all the charges contained in each cell.
+  In any case, the final charges are always placed at points where there was initially a charge.
+  </description>
+  <description lang="es">
+  Método usado al reducir el número total de cargas del disolvente, para asegurar que la distancia entre dos cargas cualesquiera no es menor de <var>DistCargas</var>.
+  El método básico (<val>normal</val>) simplemente combina las cargas más cercanas de la distancia mínima de una manera arbitraria.
+  Los otros tres métodos dividen el espacio en celda y combinan las cargas contenidas en cada celda.
+  En cualquier caso, las cargas finales están siempre situadas en puntos donde había una carga inicialmente.
+  </description>
+
+  <value>
+    <option>normal</option>
+    <option>0</option>
+    <description lang="en">This method adds together any two charges closer than the minimum distance. The result may depend on the order in which the different charges are checked. This is the default</description>
+    <description lang="es">Este método suma el valor de las cargas que están más cerca de la distancia mínima. El resultado depende del orden en que se comprueban las cargas. Este es el valor predeterminado.</description>
+  </value>
+  <value>
+    <option>cubica</option>
+    <option>cubic</option>
+    <option>SC</option>
+    <option>1</option>
+    <description lang="en">The cells are generated from a simple cubic lattice with distance between nodes <math latex="d = 1.75\cdot{}">d = 1.75·</math><var>ChargesDist</var>. The cell shape is a cube of volume <math>d^3</math>. This lattice is not optimal.</description>
+    <description lang="es">Las celdas se generan a partir de una red cúbica simple con una distancia entre nodos <math latex="d = 1.75\cdot{}">d = 1.75·</math><var>DistCargas</var>. Esta red no es óptima.</description>
+  </value>
+  <value>
+    <option>compacta</option>
+    <option>face-centered</option>
+    <option>FCC</option>
+    <option>2</option>
+    <description lang="en">The cells are generated from a face-centered cubic lattice with distance between nodes <math latex="d = 1.75\cdot{}">d = 1.75·</math><var>ChargesDist</var>. The cell shape is a rhombic dodecahedron of volume <math latex="\frac{1}{\sqrt{2}}\cdot d^3">√(1/2)·d^3</math>. This lattice minimizes the empty volume left by packing hard spheres.</description>
+    <description lang="es">Las celdas se generan a partir de una red cúbica centrada en las caras con una distancia entre nodos <math latex="d = 1.75\cdot{}">d = 1.75·</math><var>DistCargas</var>. La forma de la celda es un dodecaedro rómbico de volumen <math latex="\frac{1}{\sqrt{2}}\cdot d^3">√(1/2)·d^3</math>. Esta red minimiza el espacio vacío al empaquetar esferas rígidas.</description>
+  </value>
+  <value>
+    <option>body-centered</option>
+    <option>BCC</option>
+    <option>3</option>
+    <description lang="en">The cells are generated from a body-centered cubic lattice with distance between nodes <math latex="d = 1.75\cdot{}">d = 1.75·</math><var>ChargesDist</var>. The cell shape is a truncated octaedron of volume <math latex="\frac{2}{\sqrt{27}}\cdot d^3">√(16/27)·d^3</math>. This lattice minimizes the maximum distance of any point in space to the closest node.</description>
+    <description lang="es">Las celdas se generan a partir de una red cúbica centrada en el espacio con una distancia entre nodos <math latex="d = 1.75\cdot{}">d = 1.75·</math><var>DistCargas</var>. La forma de la celda es un octaedro truncado de volumen <math latex="\frac{2}{\sqrt{27}}\cdot d^3">√(16/27)·d^3</math>. Esta red minimiza la máxima distancia de cualquier punto del espacio al nodo más cercano.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">MMOutput</name>
+  <name lang="es">SalidaMM</name>
+
+  <default>output.mm</default>
+
+  <description lang="en">
+  Name of the file where output from the MD simulation program will be directed to.
+  The actual filename used will have <val>.cic.#</val> appended (<val>#</val> being the cycle number).
+  </description>
+  <description lang="es">
+  Nombre del fichero adonde se dirigirá la salida del programa de simulación de MD.
+  El nombre real de fichero que se usará tendrá como sufijo <val>.cic.#</val> (donde <val>#</val> es el número de ciclo).
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">OptOutput</name>
+  <name lang="es">SalidaOpt</name>
+
+  <default>optim</default>
+
+  <description lang="en">
+  Name of the file where information about geometry optimization will be written.
+  The actual filename used will have <val>.cic.#</val> appended (<val>#</val> being the cycle number).
+  </description>
+  <description lang="es">
+  Nombre del fichero donde se escribirá la información sobre la optimización de geometría.
+  El nombre real de fichero que se usará tendrá como sufijo <val>.cic.#</val> (donde <val>#</val> es el número de ciclo).
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">MaxIter</name>
+  <name lang="es">MaxIter</name>
+
+  <default>1</default>
+
+  <description lang="en">
+  Number of the last ASEP/MD cycle to perform, an integer not lower than <var>Start</var>.
+  The ASEP/MD procedure will be carried out for a number of cycles starting at <var>Start</var> and ending at <var>MaxIter</var>.
+  </description>
+  <description lang="es">
+  Número del último ciclo ASEP/MD que se realizará, un entero no menor que <var>Inicio</var>.
+  El proceso ASEP/MD se llevará a cabo durante un número de ciclos, comenzando en <var>Inicio</var> y terminando en <var>MaxIter</var>.
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">VacuumStart</name>
+  <name lang="es">InicioVacio</name>
+
+  <default lang="en">no</default>
+  <default lang="es">no</default>
+
+  <description lang="en">
+  This variable specifies whether or not an initial single-point QM calculation of the isolated solute (in vacuum) shall be done.
+  This is useful to automatically obtain a set of atomic charges to use in the first MD simulation, but it is often a good idea to start with a different set of charges.
+  </description>
+  <description lang="es">
+  Esta variable especifia si se realizará un cálculo de energía QM del soluto aislado (en vacío).
+  Esto resulat útil para obtener automáticamente un conjunto de cargas atómicas para usar en la primera simulación de MD, pero suele ser una buena idea comenzar con un conjunto de cargas diferente.
+  </description>
+
+  <value>
+    <option>si</option>
+    <option>yes</option>
+    <option>1</option>
+    <description lang="en">A single-point QM calculation will be done at the beginning, with <val>.cic.0</val> appended to the files. The atomic charges from this calculation will be used for the first MD simulation.</description>
+    <description lang="es">Se realizará un cálculo de energía QM al principio, con <val>.cic.0</val> añadido como sufijo a los ficheros. Las cargas atómicas resultantes de este cálculo se usarán en la primera simulación de MD.</description>
+  </value>
+  <value>
+    <option/>
+    <description lang="en">No initial QM calculation will be done, the first MD simulation will use the charges in <var>MMInput</var>.</description>
+    <description lang="es">No se realiza un cálculo inicial QM, la primera simulación de MD usará las cargas presentes en <var>EntradaMM</var>.</description>
+  </value>
+</variable>
+
+<variable>
+  <name lang="en">Start</name>
+  <name lang="es">Inicio</name>
+
+  <default>1</default>
+
+  <description lang="en">
+  Number of the first ASEP/MD cycle to be performed, a positive integer number.
+  This is useful to resume a calculation that has been interrupted or which has not reached convergence.
+  This setting affects only the naming of the generated files, the initial geometry and charges will still be taken from the <var>MMInput</var> file, so you may have to modify this file to resume a calculation.
+  When a calculation ends, a new <var>MMInput</var> file with <val>.final</val> appended is created with the geometry and charges that would be used in the next cycle, and this is a good starting point for continuing the calculation.
+  When a calculation is interrupted, you can take the geometry and charges from the input file of the last cycle (with <val>.cic.#</val> appended).
+  </description>
+  <description lang="es">
+  Número del primer ciclo ASEP/MD que se realizará, un número entero positivo.
+  Esto es útil para continuar un cálculo que ha sido interrumpido o que no ha alcanzado la convergencia.
+  Esta variable solo afecta a los nombres de los ficheros generados, la geometría y cargas iniciales se toman siempre del fichero <var>EntradaMM</var>, por lo que puede ser necesario modificar este fichero para continuar un cálculo.
+  Cuando un cálculo termina, se crea un nuevo fichero <var>EntradaMM</var> con <val>.final</val> añadido como sufijo, con la geometría y cargas que se usarían en el siguiente ciclo, este es un punto de partida adecuado para continuar el cálculo.
+  Cuando un cálculo se interrumpe, se pueden tomar la geometría y cargas del fichero de entrada del último ciclo (con <val>.cic.#</val> añadido como sufijo).
+  </description>
+</variable>
+
+<variable>
+  <name lang="en">MMTrajectory</name>
+  <name lang="es">TrayectoriaMM</name>
+
+  <default>traj.dcd</default>
+
+  <description lang="en">
+  Name of the DCD file from which the system configurations will be read.
+  This is only needed if <var>MMProgram</var> = <val>generic</val>.
+  </description>
+  <description lang="es">
+  Nombre del fichero DCD de donde se leerán las configuraciones del sistema.
+  Esto solo es necesario si <var>ProgramaMM</var> = <val>generico</val>.
+  </description>
+</variable>
+
+</document>

@@ -25,7 +25,7 @@ MODULE UtilidadesFis
 
 CONTAINS
 !AjusteCargas(PosQ,Pot,QTot,ValQ,Errores,Rest,Dip,PotQ,Energia)
-!OrientarMolecula(Mol,Ord)
+!OrientarMolecula(Mol,Tipo)
 !IgualarCargas(Id,Cargas)
 !PotencialCargas(Cargas,Puntos,Potencial)
 !SuperponerMoleculas(Ref,Mol,Pesos)
@@ -148,7 +148,8 @@ END SUBROUTINE AjusteCargas
 ! según sus ejes principales de inercia
 !-------------------------------------------------------------------------------
 ! Mol:      Molécula que se va a transformar
-! Ord:      1 -> se ordenan los ejes de inercia. 0 -> no se ordenan
+! Tipo:     1 -> se ordenan los ejes de inercia. 0 -> no se ordenan.
+!           -1 -> sólo se centra la molécula (no se gira)
 ! Coord:    Matriz con las coordenadas cartesianas de la molécula
 ! Inercia:  Tensor de inercia de la molécula
 ! Ejes:     Ejes principales de inercia (vectores propios del tensor)
@@ -157,12 +158,12 @@ END SUBROUTINE AjusteCargas
 ! Aux:      Variable auxiliar
 ! i,j:      Contadores
 !-------------------------------------------------------------------------------
-SUBROUTINE OrientarMolecula(Mol,Ord)
+SUBROUTINE OrientarMolecula(Mol,Tipo)
   USE TipoAtomo
   USE Utilidades
   IMPLICIT NONE
   TYPE(Atomo), DIMENSION(:), INTENT(INOUT) :: Mol
-  INTEGER, INTENT(IN) :: Ord
+  INTEGER, INTENT(IN) :: Tipo
 
   DOUBLE PRECISION, DIMENSION(SIZE(Mol,1),3) :: Coord
   DOUBLE PRECISION, DIMENSION(3,3) :: Inercia,Ejes
@@ -184,42 +185,47 @@ SUBROUTINE OrientarMolecula(Mol,Ord)
     Coord(:,i)=Coord(:,i)-SUM(Coord(:,i)*Mol(:)%m)/Masa
   END DO
 
-  !Se calcula el tensor de inercia
-  Aux=SUM((Coord(:,1)*Coord(:,1)+Coord(:,2)*Coord(:,2)+Coord(:,3)*Coord(:,3))* &
-          Mol(:)%m)
-  DO i=1,3
-    DO j=i,3
-      Inercia(i,j)=-SUM(Coord(:,i)*Coord(:,j)*Mol(:)%m)
-      Inercia(j,i)=Inercia(i,j)
+  !Si Tipo < 0 sólo se centra la molécula
+  IF (Tipo >= 0) THEN
+
+    !Se calcula el tensor de inercia
+    Aux=SUM((Coord(:,1)*Coord(:,1)+Coord(:,2)*Coord(:,2)+ &
+            Coord(:,3)*Coord(:,3))*Mol(:)%m)
+    DO i=1,3
+      DO j=i,3
+        Inercia(i,j)=-SUM(Coord(:,i)*Coord(:,j)*Mol(:)%m)
+        Inercia(j,i)=Inercia(i,j)
+      END DO
+      Inercia(i,i)=Inercia(i,i)+Aux
     END DO
-    Inercia(i,i)=Inercia(i,i)+Aux
-  END DO
 
-  !Se diagonaliza el tensor de inercia
-  CALL Diagonalizar(Inercia,Ejes,Momentos,Ord)
+    !Se diagonaliza el tensor de inercia
+    CALL Diagonalizar(Inercia,Ejes,Momentos,Tipo)
 
-  IF (Ord == 0) THEN
-    !Intenta mantener una orientación parecida a la original
-    i=SUM(MAXLOC(ABS(Ejes(1,:))))
-    IF (i /= 1) CALL Intercambiar(Ejes(:,1),Ejes(:,i))
-    i=SUM(MAXLOC(ABS(Ejes(2,2:))))+1
-    IF (i /= 2) CALL Intercambiar(Ejes(:,2),Ejes(:,i))
-  END IF
+    IF (Tipo == 0) THEN
+      !Intenta mantener una orientación parecida a la original
+      i=SUM(MAXLOC(ABS(Ejes(1,:))))
+      IF (i /= 1) CALL Intercambiar(Ejes(:,1),Ejes(:,i))
+      i=SUM(MAXLOC(ABS(Ejes(2,2:))))+1
+      IF (i /= 2) CALL Intercambiar(Ejes(:,2),Ejes(:,i))
+    END IF
 
-  !Mantiene la quiralidad de la molécula
-  !(invierte uno de los vectores si el determinante es negativo)
-  Aux=DOT_PRODUCT(Ejes(:,1),ProductoVect(Ejes(:,2),Ejes(:,3)))
-  IF (Aux < 0.0D0) THEN
-    i=SUM(MINLOC(MAXVAL(ABS(Ejes(:,:)),DIM=1)))
-    Ejes(:,i)=-Ejes(:,i)
-  END IF
+    !Mantiene la quiralidad de la molécula
+    !(invierte uno de los vectores si el determinante es negativo)
+    Aux=DOT_PRODUCT(Ejes(:,1),ProductoVect(Ejes(:,2),Ejes(:,3)))
+    IF (Aux < 0.0D0) THEN
+      i=SUM(MINLOC(MAXVAL(ABS(Ejes(:,:)),DIM=1)))
+      Ejes(:,i)=-Ejes(:,i)
+    END IF
 
-  !Se gira la molécula
+    !Se gira la molécula
 #ifdef __PORTLAND__
-  Coord=TRANSPOSE(MATMUL(TRANSPOSE(Ejes),TRANSPOSE(Coord)))
+    Coord=TRANSPOSE(MATMUL(TRANSPOSE(Ejes),TRANSPOSE(Coord)))
 #else
-  Coord=MATMUL(Coord,Ejes)
+    Coord=MATMUL(Coord,Ejes)
 #endif
+
+  END IF
 
   !Se vuelven a copiar las coordenadas
   Mol(:)%pos(1)=Coord(:,1)

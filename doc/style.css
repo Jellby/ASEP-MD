@@ -1,0 +1,81 @@
+body {
+  color: black;
+  background-color: white;
+}
+
+h2 {
+  text-align: center;
+}
+
+p.description {
+  text-indent: 1.5em;
+  margin: 0.5em 0;
+}
+
+div.variable, div.quantity {
+  margin: 1em 0;
+  border-top: 2px solid black;
+  padding-top: 1em;
+}
+
+div.sample {
+  font-family: monospace;
+  white-space: pre;
+  background-color: #EEE;
+  padding: 0.5em;
+  display: table;
+  margin: 1em auto;
+}
+
+div.names {
+  margin-left: 1em;
+  padding: 2px;
+  background-color: #EFE;
+}
+
+div.default {
+  margin: 0.5em 0 0.5em 2em;
+}
+
+div.values {
+  margin-top: 0.5em;
+}
+
+ul {
+  margin: 0;
+}
+
+i.tag {
+  font-style: italic;
+}
+
+tt.val {
+  font-family: monospace;
+  background-color: #EEE;
+  padding: 0 0.15em;
+}
+tt.empty {
+  padding: 0 2em;
+}
+
+b.var {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+b.prog {
+  font-weight: bold;
+}
+
+sub, sup {
+  font-size: 80%;
+  line-height: 0;
+}
+
+span.equation {
+  display: block;
+  text-align: center;
+}
+span.equation span.label {
+  float: right;
+}

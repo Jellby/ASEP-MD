@@ -43,6 +43,31 @@ except IndexError:
   sys.exit("Missing output file")
 
 #=============================
+# Function to replace a word in a string
+# (keeping the alignment if possible)
+
+def rep_word ( words, num, new ):
+
+  l = len(words[num])
+  words[num] = new.rjust(l)
+
+#=============================
+# Function to displace a molecule, matching an atom with reference
+def displace ( mol1, mol2, at ):
+
+  disp = {}
+  disp["x"] = mol1[at]["x"]-mol2[at]["x"]
+  disp["y"] = mol1[at]["y"]-mol2[at]["y"]
+  disp["z"] = mol1[at]["z"]-mol2[at]["z"]
+  old = copy.deepcopy(mol2)
+  for i in range(len(mol2)):
+    mol2[i]["x"] = old[i]["x"]+disp["x"]
+    mol2[i]["y"] = old[i]["y"]+disp["y"]
+    mol2[i]["z"] = old[i]["z"]+disp["z"]
+
+  return
+
+#=============================
 # Function to superpose molecules
 # see:   Acta Chrystallogr. Sec. A 61 (2005), 478
 #        J. Comput. Chem. 31 (2010), 1561
@@ -66,14 +91,16 @@ def superpose ( mol1, mol2 ):
   for i in range(len(mol1)):
     G1 += mol1[i]["x"]**2+mol1[i]["y"]**2+mol1[i]["z"]**2
 
+  # only use first atoms of mol2 to superpose
   center2 = { "x": 0.0, "y": 0.0, "z": 0.0 }
-  for i in range(len(mol2)):
+  for i in range(len(mol1)):
     center2["x"] += mol2[i]["x"]
     center2["y"] += mol2[i]["y"]
     center2["z"] += mol2[i]["z"]
-  center2["x"] = center2["x"]/len(mol2)
-  center2["y"] = center2["y"]/len(mol2)
-  center2["z"] = center2["z"]/len(mol2)
+  center2["x"] = center2["x"]/len(mol1)
+  center2["y"] = center2["y"]/len(mol1)
+  center2["z"] = center2["z"]/len(mol1)
+  # but move the whole mol2
   for i in range(len(mol2)):
     mol2[i]["x"] -= center2["x"]
     mol2[i]["y"] -= center2["y"]
@@ -209,8 +236,9 @@ for i in range(num):
   while (re.match("\s*;", line)):
     file_top_out.write(line)
     line = file_top.next()
-  m = re.match("(\s*\S*\s+\S*\s+\S*\s+\S*\s+\S*\s+\S*\s+)(\S*)(.*)",line)
-  file_top_out.write("%s%10.6f%s\n" % (m.group(1), mol[i]["q"], m.group(3)))
+  words = re.findall("(\s*\S+)",line)
+  rep_word(words, 6, " "+str(mol[i]["q"]))
+  file_top_out.write("".join(words)+"\n")
 
 # Copy the rest of the file unchanged
 for line in file_top:
@@ -224,7 +252,7 @@ file_top_out.close()
 # and write the modified coordinates
 
 coord_prec = "11.6"
-veloc_prec = "11.6"
+veloc_prec = "11.7"
 format_str = "%%5d%%5s%%5s%%5d%%%sf%%%sf%%%sf%%%sf%%%sf%%%sf\n" % (coord_prec, coord_prec, coord_prec, veloc_prec, veloc_prec, veloc_prec)
 
 file_gro = open(gro_input, "r")

@@ -1,5 +1,5 @@
 !##############################################################################
-!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!# Copyright 2011,2012,2013 Ignacio Fdez. Galván, M. Luz Sánchez,             #
 !#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
@@ -983,8 +983,8 @@ SUBROUTINE ReducirCargas(U,Num,Cargas)
                     (/1,1,1/)
       END SELECT
       Dist=Distancia(CargasIni(i,1:3),Indice(:)*R)
-      j=Puntos(Indice(1),Indice(2),Indice(3))
 !$OMP CRITICAL
+      j=Puntos(Indice(1),Indice(2),Indice(3))
       IF (j == 0) THEN
         !Si no hay carga en esa celda, se pone esta
         Puntos(Indice(1),Indice(2),Indice(3))=i

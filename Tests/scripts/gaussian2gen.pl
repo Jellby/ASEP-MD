@@ -104,7 +104,7 @@ while (<GAU_OUTPUT>) {
     }
   }
   # Mulliken charges
-  if ($_ =~ /Total atomic charges/) {
+  if (($_ =~ /^\s*Total atomic charges/) || ($_ =~ /^\s*Mulliken atomic charges/)) {
     $_ = <GAU_OUTPUT>;
     for (my $i=0; $i<$Q_natoms; $i++) {
       $_ = <GAU_OUTPUT>;

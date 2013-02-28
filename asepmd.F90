@@ -56,6 +56,11 @@ PROGRAM ASEPMD
     CALL LeerSistemaGenerico(U)
     CLOSE(U)
 
+    !Si no se usa Moldy, sólo se centra la molécula
+    CALL OrientarMolecula(Soluto(:),-1)
+    CALL OrientarMolecula(Disolvente(:),-1)
+    CALL OrientarMolecula(Disolvente2(:),-1)
+
    CASE (1) !Moldy
     U=NuevaUnidad()
     OPEN(U,FILE=TRIM(EntradaMM),ACTION='READ',STATUS='OLD')
@@ -66,11 +71,11 @@ PROGRAM ASEPMD
     OPEN(U,FILE=TRIM(MoldyInput),ACTION='READ',STATUS='OLD')
     CALL LeerSistemaMoldy(U)
     CLOSE(U)
-  END SELECT
 
-  CALL OrientarMolecula(Soluto(:),0)
-  CALL OrientarMolecula(Disolvente(:),0)
-  CALL OrientarMolecula(Disolvente2(:),0)
+    CALL OrientarMolecula(Soluto(:),0)
+    CALL OrientarMolecula(Disolvente(:),0)
+    CALL OrientarMolecula(Disolvente2(:),0)
+  END SELECT
 
 !>>> Cálculo cuántico inicial
 
@@ -132,7 +137,12 @@ PROGRAM ASEPMD
       CALL OptimizarGeometria(Soluto,U)
       CLOSE(U)
 
-      CALL OrientarMolecula(Soluto(:),0)
+      IF (ProgramaMM == 1) THEN
+        CALL OrientarMolecula(Soluto(:),0)
+       ELSE
+        !Si no se usa Moldy, sólo se centra la molécula
+        CALL OrientarMolecula(Soluto(:),-1)
+      END IF
 
      ELSE
 

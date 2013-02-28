@@ -177,11 +177,74 @@ for i in range(maxid):
 
 file_dump.close()
 
+# Read exclusions and 1-4 parameters if solute indexes are given
+exclusions = {}
+pairs = {}
+if (sol_ini != None):
+
+  file_dump = open(dump_input, "r")
+  for line in file_dump:
+    match = re.match("\s*excls\[(\d+)\]\[.*\]={(.*?)(}?)$",line)
+    if (match):
+      atom = int(match.group(1))
+      # Read only solute exclusions
+      if ((atom < sol_ini) or (atom > sol_fin)): continue
+      excllist = match.group(2)
+      while (match.group(3) == ""):
+        match = re.match("(\s*)(.*?)(}?)$",file_dump.next())
+        excllist += match.group(2)
+      excllist = map(int,excllist.split(", "))
+      # Convert the indexes to 1-based, without solute
+      # and remove solute-solute exclusions
+      for i in reversed(range(len(excllist))):
+        if ((excllist[i] < sol_ini) or (excllist[i] > sol_fin)):
+          if (excllist[i] > sol_fin): excllist[i] -= sol_fin-sol_ini
+        else:
+          del excllist[i]
+      if (excllist): exclusions[atom-sol_ini+1] = excllist
+  file_dump.close()
+
+  file_dump = open(dump_input, "r")
+  for line in file_dump:
+    if (re.match("\s*LJ-14",line)): break
+  num = int(file_dump.next().split()[1])/3
+  file_dump.next()
+  for i in range(num):
+    pair = map(int, file_dump.next().split()[3:5])
+    check = map(lambda x: (x < sol_ini) or (x > sol_fin), pair)
+    # Remove solute-solute and solvent-solvent pairs
+    # and convert the indexes to 1-based, without solute
+    if (check[0]):
+      if (not check[1]):
+        a = pair[1]-sol_ini+1
+        b = pair[0]
+    elif (check[1]):
+      a = pair[0]-sol_ini+1
+      b = pair[1]
+    if (check[0] != check[1]):
+      if (b > sol_fin): b -= sol_fin-sol_ini
+      if (not a in pairs): pairs[a] = []
+      pairs[a].append(b)
+
+  file_dump.close()
+
 #=============================
 # Print the generic system file
 
 print "# PLEASE CHECK EVERYTHING IS CORRECT"
 print
+
+if (exclusions):
+  print "# solute-solvent exclusions (not converted):"
+  for i in sorted(exclusions.keys()):
+    if i in exclusions: print "#", i, exclusions[i]
+  print
+
+if (pairs):
+  print "# solute-solvent pairs (not converted):"
+  for i in sorted(pairs.keys()):
+    if i in pairs: print "#", i, pairs[i]
+  print
 
 # Print the solute data (in angstrom, amu, and e)
 print "Solute"
@@ -191,7 +254,7 @@ for i in range(len(mol_geom)):
   if (k < sol): continue
   if (sol_ini == None): sol_ini = 0
   if (sol_fin == None): sol_fin = len(mol_geom[i])-1
-  print "  %s" % mol_name[i]
+  print "  %s" % re.sub(" ","_",mol_name[i])
   print "  %i" % 1
   print "  %i" % (sol_fin-sol_ini+1)
   for j in range(sol_ini,sol_fin+1):

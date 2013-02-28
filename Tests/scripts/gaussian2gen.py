@@ -101,7 +101,7 @@ for line in file_gau:
       Q_gradient.extend(map(float, file_gau.next().split()))
 
   # Mulliken charges
-  elif re.search("Total atomic charges", line):
+  elif (re.match("\s*Total atomic charges", line) or re.match("\s*Mulliken atomic charges", line)):
     file_gau.next()
     for i in range(Q_natoms):
       Q_mulliken.append(float(file_gau.next().split()[2]))

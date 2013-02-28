@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="output_xhtml.xsl"?>
+
+<document>
+
+<title lang="en">ASEP/MD Output</title>
+<title lang="es">Salida ASEP/MD</title>
+
+<paragraph lang="en">
+The output of <prog>ASEP/MD</prog> is written to the standard output.
+After the header, a list of all input variables and their values is printed.
+Variable names with a <val>#</val> on the left are set to their default values (because they were not specified in the input file).
+</paragraph>
+<paragraph lang="es">
+La salida de <prog>ASEP/MD</prog> se escribe en la salida estándar.
+Después de la cabecera, se escribe una lista de todas las variables de entrada y sus valores.
+Las variables que tienen un <val>#</val> a su izquierda toman sus valores predeterminados (debido a que no se han especificado en el fichero de entrada).
+</paragraph>
+
+<paragraph lang="en">
+Then after each cycle of the calculation is completed, i.e., after the QM calculation or geometry optimization is finished, a summary of some energies are printed.
+The following is a sample of the information printed for a given cycle (iteration).
+</paragraph>
+<paragraph lang="es">
+Después, una vez completado cada ciclo del cálculo (cuando termina el cálculo QM o la optimización de geometría de cada ciclo), se escriben algunas energías o propiedades importantes.
+A continuación se muestra un ejemplo de la información que se escribe para un ciclo (iteración) determinado.
+</paragraph>
+
+<sample lang="en">ITERATION   3
+================================================================================
+         After the MM simulation
+--------------------------------------------------------------------------------
+Solute-solvent &lt;q-q&gt; interaction:                /        -0.0088604397 Eh
+                                                 \        -5.5600098288 kcal/mol
+Solute-solvent &lt;VdW&gt; interaction:                /        -0.0296168605 Eh
+                                                 \       -18.5848603971 kcal/mol
+
+         Solvent fit
+--------------------------------------------------------------------------------
+              Initial charges:                                    41696
+              After reduction:                                     5762
+              Points for potential fitting:                        4944
+              RErr:                                        0.0001013017
+              Rms:                                         0.0000154923 Eh/e
+              RRms:                                        0.0001548081
+              Maximum error in the potential:              0.0001152420 Eh/e
+
+         After the QM calculation
+--------------------------------------------------------------------------------
+QM energy:                                              -441.2275384558 Eh
+Total energy:                                           -441.2571535062 Eh
+Energy difference:                                        -0.0003049096 Eh
+Dipole moment:                                   /         0.7099569167 e*a0
+                                                 \         1.8045303159 D
+Solute-solvent QM-&lt;q&gt; interaction:               /        -0.0088890722 Eh
+                                                 \        -5.5779769959 kcal/mol
+Solute-solvent &lt;q-q&gt; interaction:                /        -0.0088932916 Eh
+                                                 \        -5.5806246917 kcal/mol
+Solute-solvent &lt;VdW&gt; interaction:                /        -0.0296150503 Eh
+                                                 \       -18.5837244997 kcal/mol
+Internal energy:                                        -441.2186493836 Eh
+================================================================================</sample>
+
+<sample lang="es">ITERACION   3
+================================================================================
+         Despues de la simulacion MM
+--------------------------------------------------------------------------------
+Interaccion &lt;q-q&gt; soluto-disolvente:             /        -0.0088604397 Eh
+                                                 \        -5.5600098288 kcal/mol
+Interaccion &lt;VdW&gt; soluto-disolvente:             /        -0.0296168605 Eh
+                                                 \       -18.5848603971 kcal/mol
+
+         Ajuste del disolvente
+--------------------------------------------------------------------------------
+              Cargas iniciales:                                   41696
+              Despues de reducir:                                  5762
+              Puntos para ajustar el potencial:                    4944
+              RErr:                                        0.0001013017
+              Rms:                                         0.0000154923 Eh/e
+              RRms:                                        0.0001548081
+              Error maximo en el potencial:                0.0001152420 Eh/e
+
+         Despues del calculo QM
+--------------------------------------------------------------------------------
+Energia QM:                                             -441.2275384558 Eh
+Energia total:                                          -441.2571535062 Eh
+Diferencia de energia:                                    -0.0003049096 Eh
+Momento dipolar:                                 /         0.7099569167 e*a0
+                                                 \         1.8045303159 D
+Interaccion QM-&lt;q&gt; soluto-disolvente:            /        -0.0088890722 Eh
+                                                 \        -5.5779769959 kcal/mol
+Interaccion &lt;q-q&gt; soluto-disolvente:             /        -0.0088932916 Eh
+                                                 \        -5.5806246917 kcal/mol
+Interaccion &lt;VdW&gt; soluto-disolvente:             /        -0.0296150503 Eh
+                                                 \       -18.5837244997 kcal/mol
+Energia interna:                                        -441.2186493836 Eh
+================================================================================</sample>
+
+<paragraph lang="en">
+In general, values are given in atomic units, but interaction energies and dipole moments are also given in more convenient units (kcal/mol and D).
+</paragraph>
+<paragraph lang="es">
+En general, los valores se dan en unidades atómicas, pero las energías de interacción y los momentos dipolares se dan también en unidades más prácticas (kcal/mol y D).
+</paragraph>
+
+<paragraph lang="en">
+There are two main blocks in the output, one for interaction energies <val>After the MM simulation</val>, and another for properties <val>After the QM calculation</val>.
+Between them there is a summary of the fitting of point charges to reproduce the ASEP.
+</paragraph>
+<paragraph lang="es">
+Hay dos bloques principales en la salida, uno para energías de interacción <val>Despues de la simulacion MM</val> y otro para las propiedades <val>Despues del calculo QM</val>.
+Entre los bloques aparece un resumen del ajuste de las cargas puntuales que reproducen el ASEP.
+</paragraph>
+
+<quantity>
+  <name lang="en">Solute-solvent &lt;q-q&gt; interaction</name>
+  <name lang="es">Interaccion &lt;q-q&gt; soluto-disolvente</name>
+
+  <description lang="en">
+This is the average (over the configurations used in the calculation) electrostatic interaction energy between solute and solvent.
+The solute molecule is considered as a set of point charges.
+If there is more than one solute molecule, the average is also performed over all solute molecules, considering in each case the other solute molecules as solvent.
+It is likely that this value does not match the equivalent one reported by the MM simulation program even if the same configurations are used in the average, this is because <prog>ASEP/MD</prog> applies no cut-off, short- or long-range corrections, with two exceptions:
+If <var>RFCutoff</var> &lt; <val>1000</val>, a ‘reaction field’ correction is applied to the electrostatic interactions.
+If <var>MMProgram</var> = <val>Moldy</val>, only solvent molecules in the largest sphere fitting the simulation box are considered.
+  </description>
+  <description lang="es">
+Este es el promedio (sobre las configuraciones usadas en el cálculo) de la energía de interacción electrostática entre soluto y disolvente.
+La molécula de soluto se considera como un conjunto de cargas puntuales.
+Si hay más de una molécula de soluto, el promedio también se realiza sobre todas las moléculas de soluto, considerando en cada caso el resto de moléculas de soluto como disolvente.
+Es probable que este valor no coincida con el proporcionado por el programa de simulación MM, incluso si se usan las mismas configuraciones en el promedio, esto es debido a que <prog>ASEP/MD</prog> no aplica distancias de corte ni correcciones de corto o largo alcance, con dos excepciones:
+Si <var>CorteRF</var> &lt; <val>1000</val>, se aplica una corrección de «campo de reacción» a las interacciones electrostáticas.
+Si <var>ProgramaMM</var> = <val>Moldy</val>, solo se consideran las moléculas de disolvente dentro de la mayor esfera que cabe en la caja de simulación.
+  </description>
+
+  <description lang="en">
+In the <val>After the MM simulation</val> block, the solute geometry and charges are those used for the MM simulation.
+In the <val>After the QM calculation</val> block, the solute geometry and charges are those obtained from the QM calculation or geometry optimization, i.e, those that will be used in the next MM simulation.
+In both cases the system configurations are the same.
+  </description>
+  <description lang="es">
+En el bloque <val>Despues de la simulacion MM</val>, la geometría y cargas del soluto son las usadas en la simulación MM.
+En el bloque <val>Despues del calculo QM</val>, la geometría y cargas del soluto son las obtenidas del cálculo QM o la optimización de geometría, es decir, las que se emplearán en la siguiente simulación MM.
+En ambos casos las configuraciones del sistema son las mismas.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Solute-solvent &lt;VdW&gt; interaction</name>
+  <name lang="es">Interaccion &lt;VdW&gt; soluto-disolvente</name>
+
+  <description lang="en">
+This is the average (over the configurations used in the calculation) Van der Waals interaction energy between solute and solvent.
+If there is more than one solute molecule, the average is also performed over all solute molecules, considering in each case the other solute molecules as solvent.
+It is likely that this value does not match the equivalent one reported by the MM simulation program even if the same configurations are used in the average, this is because <prog>ASEP/MD</prog> applies no cut-off or long-range correction, with one exception:
+If <var>MMProgram</var> = <val>Moldy</val>, only solvent molecules in the largest sphere fitting the simulation box are considered.
+  </description>
+  <description lang="es">
+Este es el promedio (sobre las configuraciones usadas en el cálculo) de la energía de interacción de Van der Waals entre soluto y disolvente.
+Si hay más de una molécula de soluto, el promedio también se realiza sobre todas las moléculas de soluto, considerando en cada caso el resto de moléculas de soluto como disolvente.
+Es probable que este valor no coincida con el proporcionado por el programa de simulación MM, incluso si se usan las mismas configuraciones en el promedio, esto es debido a que <prog>ASEP/MD</prog> no aplica distancias de corte ni correcciones de largo alcance, con una excepción:
+Si <var>ProgramaMM</var> = <val>Moldy</val>, solo se consideran las moléculas de disolvente dentro de la mayor esfera que cabe en la caja de simulación.
+  </description>
+
+  <description lang="en">
+In the <val>After the MM simulation</val> block, the solute geometry is that used for the MM simulation.
+In the <val>After the QM calculation</val> block, the solute geometry is that resulting from the geometry optimization, i.e, the geometry that will be used in the next MM simulation.
+In both cases the system configurations are the same, so that if there is no geometry change, both values are equal.
+  </description>
+  <description lang="es">
+En el bloque <val>Despues de la simulacion MM</val>, la geometría es la usada en la simulación MM.
+En el bloque <val>Despues del calculo QM</val>, la geometría del soluto es la obtenida de la optimización de geometría, es decir, la geometría que  se empleará en la siguiente simulación MM.
+En ambos casos las configuraciones del sistema son las mismas, por lo que si no hay cambio de geometría los valores deben ser también iguales.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">QM energy</name>
+  <name lang="es">Energia QM</name>
+
+  <description lang="en">
+The energy reported by the QM program.
+Includes the electrostatic interaction between the solute and the external charges, but not the interaction between the external charges themselves.
+If a geometry optimization is performed, this correspond to the final geometry of the optimization process.
+  </description>
+  <description lang="es">
+La energía que devuelve el programa QM.
+Incluye la interacción electrostática entre el soluto y las cargas externas, pero no la interacción de las cargas externas entre sí.
+Si se realiza una optimización de geometría, esta energia corresponde a la última geometría de la optimización.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Total energy</name>
+  <name lang="es">Energia total</name>
+
+  <description lang="en">
+Sum of the QM energy and the Van der Waals interaction energy (from the <val>After the QM calculation</val> block, see above).
+  </description>
+  <description lang="es">
+Suma de la energía QM y la energía de interacción de Van der Waals (del bloque <val>Despues del calculo QM</val>, ver arriba).
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Energy difference</name>
+  <name lang="es">Diferencia de energia</name>
+
+  <description lang="en">
+Difference in total energy from the previous cycle.
+  </description>
+  <description lang="es">
+Diferencia de la energía total con respecto al ciclo anterior.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Dipole moment</name>
+  <name lang="es">Momento dipolar</name>
+
+  <description lang="en">
+Modulus of the dipole moment vector of the solute, as reported by the QM program.
+  </description>
+  <description lang="es">
+Módulo del vector momento dipolar del soluto, obtenido del program de cálculo QM.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Solute-solvent QM-&lt;q&gt; interaction</name>
+  <name lang="es">Interaccion QM-&lt;q&gt; soluto-disolvente</name>
+
+  <description lang="en">
+This is the electrostatic interaction energy between the solute and the external charges representing the solvent.
+It is calculated from the electrostatic potential reported by the QM program on the positions of the charges.
+  </description>
+  <description lang="es">
+Esta es la energía de interacción electrostática entre el soluto y las cargas externas que representan el disolvente.
+Se calcula a partir del del potencial electrostático que proporciona el programa QM en las posiciones de las cargas.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Internal energy</name>
+  <name lang="es">Energia interna</name>
+
+  <description lang="en">
+QM energy of the solute, excluding the interaction with the solvent.
+It is simply the <val>QM energy</val> minus the <val>Solute-solvent QM-&lt;q&gt; interaction</val>.
+  </description>
+  <description lang="es">
+Energía QM del soluto, sin contar la interacción con el disolvente.
+Es simplemente la <val>Energia QM</val> menos la <val>Interaccion QM-&lt;q&gt; soluto-disolvente</val>.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Initial charges</name>
+  <name lang="es">Cargas iniciales</name>
+
+  <description lang="en">
+Initial number of explicit solvent charges to include as external charges.
+These charges correspond to solvent atoms that, in each configuration, are inside the volume defined by <var>CavityType</var>, <var>CavityRadius</var> and <var>SolventRadius</var>.
+  </description>
+  <description lang="es">
+Número inicial de cargas explícitas del disolvente para incluir como cargas externas.
+Estas cargas corresponden a los átomos del disolvente que, en cada configuración, se encuentran dentro del volumen definido por <var>TipoCavidad</var>, <var>RadioCavidad</var> y <var>RadioDisolvente</var>.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">After reduction</name>
+  <name lang="es">Despues de reducir</name>
+
+  <description lang="en">
+Final number of explicit solvent charges included as external charges.
+These charges result from adding together some initial charges according to the settings in <var>ReductionType</var> and <var>ChargesDist</var>.
+  </description>
+  <description lang="es">
+Número final de cargas explícitas del disolvente incluidas como cargas externas.
+Estas cargas son el resultado de unir las cargas iniciales según los valores de <var>TipoReduccion</var> y <var>DistCargas</var>.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Points for potential fitting</name>
+  <name lang="es">Puntos para ajustar el potencial</name>
+
+  <description lang="en">
+Number of grid points where the ASEP is calculated and reproduced by the external charges.
+This number depends on the values of <var>GridType</var>, <var>GridDist</var> and <var>GridFactor</var>.
+The number of grid points must be larger than the number of fitted charges (not the number of charges above, but the number controlled by the <var>Subdivisions</var> input variable).
+  </description>
+  <description lang="es">
+Número de puntos de red donde se calcula el ASEP, cuyo valor es reproducido por las cargas externas.
+Este número depende de los valores de <var>TipoMalla</var>, <var>DistMalla</var> y <var>FactorMalla</var>.
+El número de puntos de red debe ser mayor que el número de cargas ajustadas (no el número de cargas de arriba, sino el número controlado por la variable de entrada <var>Subdivisiones</var>).
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">RErr</name>
+  <name lang="es">RErr</name>
+
+  <description lang="en">
+Relative error of the fit:
+  <equation>
+<math latex="\text{rerr} = \frac{1}{N}\sum\limits_{i=1}^N \frac{|V'_i-V_i|}{V_i}">rerr = sum( |V'-V|/V ) / N</math> ,
+  </equation>
+where <math latex="V_i">V</math> is the ASEP calculated on each grid point, <math latex="V'_i">V'</math> is the electrostatic potential generated on each grid point by the fitted charges, and <math>N</math> is the total number of grid points.
+  </description>
+  <description lang="es">
+Error relativo del ajuste:
+  <equation>
+<math latex="\text{rerr} = \frac{1}{N}\sum\limits_{i=1}^N \frac{|V'_i-V_i|}{V_i}">rerr = sum( |V'-V|/V ) / N</math> ,
+  </equation>
+donde <math latex="V_i">V</math> es el ASEP calculado en cada punto de red, <math latex="V'_i">V'</math> es el potencial electrostático generado en cada punto de red por las cargas ajustadas y <math>N</math> es el número total de puntos de red.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Rms</name>
+  <name lang="es">Rms</name>
+
+  <description lang="en">
+Root mean square error of the fit:
+  <equation>
+<math latex="\text{rms} = \sqrt{\frac{1}{N}\sum\limits_{i=1}^N (V'_i-V_i)^2}">rms = sqrt( sum( (V'-V)^2 ) / N )</math> ,
+  </equation>
+where <math latex="V_i">V</math> is the ASEP calculated on each grid point, <math latex="V'_i">V'</math> is the electrostatic potential generated on each grid point by the fitted charges, and <math>N</math> is the total number of grid points.
+  </description>
+  <description lang="es">
+Media cuadrática del error del ajuste:
+  <equation>
+<math latex="\text{rms} = \sqrt{\frac{1}{N}\sum\limits_{i=1}^N (V'_i-V_i)^2}">rms = sqrt( sum( (V'-V)^2 ) / N )</math> ,
+  </equation>
+donde <math latex="V_i">V</math> es el ASEP calculado en cada punto de red, <math latex="V'_i">V'</math> es el potencial electrostático generado en cada punto de red por las cargas ajustadas y <math>N</math> es el número total de puntos de red.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">RRms</name>
+  <name lang="es">RRms</name>
+
+  <description lang="en">
+Relative root mean square error of the fit:
+  <equation>
+<math latex="\text{rrms} = \sqrt{\frac{1}{N}\sum\limits_{i=1}^N \left(\frac{V'_i-V_i}{V_i}\right)^2}">rrms = sqrt( sum( ((V'-V)/V)^2 ) / N )</math> ,
+  </equation>
+where <math latex="V_i">V</math> is the ASEP calculated on each grid point, <math latex="V'_i">V'</math> is the electrostatic potential generated on each grid point by the fitted charges, and <math>N</math> is the total number of grid points.
+  </description>
+  <description lang="es">
+Media cuadrática del error relativo del ajuste:
+  <equation>
+<math latex="\text{rrms} = \sqrt{\frac{1}{N}\sum\limits_{i=1}^N \left(\frac{V'_i-V_i}{V_i}\right)^2}">rrms = sqrt( sum( ((V'-V)/V)^2 ) / N )</math> ,
+  </equation>
+donde <math latex="V_i">V</math> es el ASEP calculado en cada punto de red, <math latex="V'_i">V'</math> es el potencial electrostático generado en cada punto de red por las cargas ajustadas y <math>N</math> es el número total de puntos de red.
+  </description>
+</quantity>
+
+<quantity>
+  <name lang="en">Maximum error in the potential</name>
+  <name lang="es">Error maximo en el potencial</name>
+
+  <description lang="en">
+Maximum absolute difference between the real and the fitted electrostatic potential: <math latex="\max |V'_i-V_i|">max( |V'-V| )</math>.
+  </description>
+  <description lang="es">
+Diferencia absoluta máxima entre el potencial electrostático real y el ajustado: <math latex="\max |V'_i-V_i|">max( |V'-V| )</math>.
+  </description>
+</quantity>
+
+</document>
