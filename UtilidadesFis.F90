@@ -418,7 +418,11 @@ SUBROUTINE SuperponerMoleculas(Ref,Mol,Pesos,Trans)
     !P(4) es el polinomio, P(5) la derivada
     P(4)=P(1)+P(2)*Valor+P(3)*Valor**2+Valor**4
     P(5)=P(2)+2.0D0*P(3)*Valor+4.0D0*Valor**3
-    Valor=Valor-P(4)/P(5)
+    IF (ABS(P(5)) > Preci) THEN
+      Valor=Valor-P(4)/P(5)
+     ELSE
+      Valor=Valor-P(4)/SIGN(Preci,P(5))
+    END IF
   END DO
 
   !Se obtiene el vector propio correspondiente
@@ -437,9 +441,14 @@ SUBROUTINE SuperponerMoleculas(Ref,Mol,Pesos,Trans)
     END DO
     IF (Norma(Vector) > Preci) EXIT
   END DO
-  !Parece que la convención de signos es distinta
-  Vector(1)=-Vector(1)
-  Vector=Normalizar(Vector)
+  IF (Norma(Vector) > Preci) THEN
+    !Parece que la convención de signos es distinta
+    Vector(1)=-Vector(1)
+    Vector=Normalizar(Vector)
+   ELSE
+    Vector(1)=1.0D0
+    Vector(2:3)=0.0D0
+  END IF
 
   !Finalmente se rota y desplaza la segunda molécula
   DO i=1,SIZE(Ref,1)
