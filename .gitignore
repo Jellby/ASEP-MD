@@ -1,0 +1,27 @@
+*.o
+*.mod
+
+# Programs:
+asepmd
+Tests/asep
+Tests/asepmd
+Tests/busq
+Tests/calcmm
+Tests/calcqm
+Tests/cargas
+Tests/cargasatom
+Tests/cav
+Tests/configs
+Tests/coord
+Tests/dcd
+Tests/dernum
+Tests/diag
+Tests/elibre
+Tests/eq
+Tests/int
+Tests/interp
+Tests/inv
+Tests/malla
+Tests/opt
+Tests/rfo
+Tests/sist
