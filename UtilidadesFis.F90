@@ -447,7 +447,7 @@ SUBROUTINE SuperponerMoleculas(Ref,Mol,Pesos,Trans)
     Vector=Normalizar(Vector)
    ELSE
     Vector(1)=1.0D0
-    Vector(2:3)=0.0D0
+    Vector(2:4)=0.0D0
   END IF
 
   !Finalmente se rota y desplaza la segunda molécula
