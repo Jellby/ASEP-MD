@@ -1,5 +1,5 @@
 !##############################################################################
-!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!# Copyright 2011,2012,2018 Ignacio Fdez. Galván, M. Luz Sánchez,             #
 !#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# ASEP-MD is free software: you can redistribute it and/or modify it under   #
@@ -32,9 +32,9 @@ PROGRAM ASEPMD
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: Potencial,ASEP
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: CargasAjustadas
   DOUBLE PRECISION, DIMENSION(4) :: ErrAjuste
-  DOUBLE PRECISION, DIMENSION(2) :: IntMD
-  DOUBLE PRECISION :: EnergiaAnt,CargaTotal
-  INTEGER :: U,i,Iter,Num,NumCargas,Error
+  DOUBLE PRECISION, DIMENSION(4) :: IntMD
+  DOUBLE PRECISION :: EnergiaAnt,CargaTotal,DifCargas
+  INTEGER :: U,i,Iter,IterIni,Num,NumCargas,Error
 
 !>>> Iniciar datos
 
@@ -99,7 +99,13 @@ PROGRAM ASEPMD
 
 !>>> Empieza el ciclo ASEP/MD
 
-  DO Iter=Inicio,MaxIter
+  IF (Polarizable) THEN
+    IterIni = 1
+   ELSE
+    IterIni = Inicio
+  END IF
+
+  DO Iter=IterIni,MaxIter
 
     WRITE(Extension,*) Iter
     Extension='.cic.'//ADJUSTL(Extension)
@@ -112,11 +118,28 @@ PROGRAM ASEPMD
 
 !>>> Lanzar la dinámica
 
-    CALL EjecutarMM(.TRUE.)
+    ! Sólo se hace la dinámica si no es un cálculo polarizable
+    ! o en la primera iteración
+    IF ((Iter == IterIni) .OR. (.NOT. Polarizable)) THEN
+      IF (Polarizable) THEN
+        WRITE(Extension,*) Inicio
+       ELSE
+        WRITE(Extension,*) Iter
+      END IF
+      Extension='.cic.'//ADJUSTL(Extension)
+      CALL EjecutarMM(.TRUE.)
 
-    CALL Promedios(0,Soluto) !Abre el fichero UConf
-    IntMD(1)=EnergiaEMM
-    IntMD(2)=EnergiaVdW
+      CALL Promedios(0,Soluto) !Abre el fichero UConf
+      IntMD(1)=EnergiaEMM
+      IntMD(2)=EnergiaVdW
+      IntMD(3)=EnergiaQDip(1)
+      IntMD(4)=EnergiaQDip(2)
+    END IF
+
+    IF (Polarizable) THEN
+      WRITE(Extension,*) Iter
+      Extension='.pol.'//ADJUSTL(Extension)
+    END IF
 
 !>>> Calcular el potencial promedio y cargas explícitas
 
@@ -129,6 +152,8 @@ PROGRAM ASEPMD
     CALL AjusteCargasExternas
 
 !>>> Cálculo cuántico con disolvente
+
+    DifCargas=0.0D0
 
     IF (MaxIterOpt > 0) THEN
 
@@ -150,18 +175,29 @@ PROGRAM ASEPMD
       ALLOCATE(MolQM(SIZE(Soluto,1)))
       MolQM=Soluto
       CALL EjecutarQM(0)
+      DO i=1,SIZE(Soluto)
+        DifCargas=MAX(DifCargas,ABS(Soluto(i)%q-MolQM(i)%q))
+      END DO
       Soluto=MolQM
 
     END IF
 
-    CALL CerrarUConf()
+    IF (.NOT. Polarizable) CALL CerrarUConf()
 
     CALL EscribirASEPMD()
+
+    IF (Polarizable .AND. (DifCargas < ConvCargasPol)) EXIT
+
+    IF (Iter == MaxIter) CALL Mensaje('ASEPMD',44,.FALSE.)
 
   END DO
 
 !>>> Escribe el sistema final (útil para las cargas del soluto)
-  Extension='.final'
+  IF (Polarizable) THEN
+    Extension='.pol.final'
+  ELSE
+    Extension='.final'
+  END IF
   CALL EjecutarMM(.FALSE.)
 
 CONTAINS
@@ -198,13 +234,19 @@ SUBROUTINE EscribirASEPMD
   WRITE(6,101) TRIM(Textos(8)),Iter
   WRITE(6,20)
   IF (Iter > 0) THEN
-    WRITE(6,100) TRIM(Textos(24))
-    WRITE(6,10)
-    WRITE(6,103) TRIM(Textos(26)),IntMD(1),'Eh'
-    WRITE(6,104) '',IntMD(1)/KcalmolAtomica,'kcal/mol'
-    WRITE(6,103) TRIM(Textos(27)),IntMD(2),'Eh'
-    WRITE(6,104) '',IntMD(2)/KcalmolAtomica,'kcal/mol'
-    WRITE(6,*)
+    IF ((Iter == IterIni) .OR. (.NOT. Polarizable)) THEN
+      WRITE(6,100) TRIM(Textos(24))
+      WRITE(6,10)
+      WRITE(6,103) TRIM(Textos(26)),IntMD(1),'Eh'
+      WRITE(6,104) '',IntMD(1)/KcalmolAtomica,'kcal/mol'
+      WRITE(6,103) TRIM(Textos(27)),IntMD(2),'Eh'
+      WRITE(6,104) '',IntMD(2)/KcalmolAtomica,'kcal/mol'
+      WRITE(6,103) TRIM(Textos(78)),IntMD(3),'Eh'
+      WRITE(6,104) '',IntMD(3)/KcalmolAtomica,'kcal/mol'
+      WRITE(6,103) TRIM(Textos(79)),IntMD(4),'Eh'
+      WRITE(6,104) '',IntMD(4)/KcalmolAtomica,'kcal/mol'
+      WRITE(6,*)
+    END IF
     WRITE(6,100) TRIM(Textos(33))
     WRITE(6,10)
     WRITE(6,105) TRIM(Textos(34)),NumCargas
@@ -232,6 +274,10 @@ SUBROUTINE EscribirASEPMD
     WRITE(6,104) '',EnergiaEMM/KcalmolAtomica,'kcal/mol'
     WRITE(6,103) TRIM(Textos(27)),EnergiaVdW,'Eh'
     WRITE(6,104) '',EnergiaVdW/KcalmolAtomica,'kcal/mol'
+    WRITE(6,103) TRIM(Textos(78)),EnergiaQDip(1),'Eh'
+    WRITE(6,104) '',EnergiaQDip(1)/KcalmolAtomica,'kcal/mol'
+    WRITE(6,103) TRIM(Textos(79)),EnergiaQDip(2),'Eh'
+    WRITE(6,104) '',EnergiaQDip(2)/KcalmolAtomica,'kcal/mol'
     WRITE(6,102) TRIM(Textos(32)),EnergiaQM-EnergiaEQM,'Eh'
   END IF
   WRITE(6,20)
@@ -313,6 +359,7 @@ SUBROUTINE PotencialYCargas
   Num=0
   NumCargas=0
   CALL AbrirUConf()
+  CALL AbrirUDip()
   DO
     CALL LeerConfig(Error)
     IF (Error /= 0) EXIT
@@ -321,6 +368,7 @@ SUBROUTINE PotencialYCargas
     CALL SeleccionarMols(Utmp,NumCargas)
     Num=Num+1
   END DO
+  CALL CerrarUDip()
 
   CALL ReducirCargas(Utmp,NumCargas,CargasDisolvente)
   CargasDisolvente(:,4)=CargasDisolvente(:,4)/DBLE(Num)

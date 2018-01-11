@@ -1,5 +1,5 @@
 !##############################################################################
-!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!# Copyright 2011,2012,2018 Ignacio Fdez. Galván, M. Luz Sánchez,             #
 !#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
@@ -67,6 +67,7 @@ END MODULE DatosQM
 MODULE DatosQMMM
 
   DOUBLE PRECISION :: EnergiaEQM,EnergiaEMM,EnergiaVdW
+  DOUBLE PRECISION, DIMENSION(2) :: EnergiaQDip
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: GradVdW
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: HessVdW
 
@@ -168,13 +169,13 @@ MODULE Espanol
 
   CHARACTER(LEN=LLL), DIMENSION(6) :: Titulo
     DATA Titulo(1) /'========================================================='/
-    DATA Titulo(2) /'|                    ASEP-MD v. 2.0                     |'/
+    DATA Titulo(2) /'|                    ASEP-MD v. 2.1                     |'/
     DATA Titulo(3) /'|                  ------------------                   |'/
-    DATA Titulo(4) /'| Copyright 2011,2012 I.F.G., M.L.S., A.M.L., M.E.M.,   |'/
-    DATA Titulo(5) /'|                     M.A.A.                            |'/
+    DATA Titulo(4) /'| Copyright 2011,2012,2013,2018 I.F.G., M.L.S., A.M.L., |'/
+    DATA Titulo(5) /'|                               M.E.M., M.A.A.          |'/
     DATA Titulo(6) /'========================================================='/
 
-  CHARACTER(LEN=32), DIMENSION(44) :: Variables
+  CHARACTER(LEN=32), DIMENSION(50) :: Variables
     DATA Variables( 1) /'TipoCargas'/       !TipoCargas
     DATA Variables( 2) /'EntradaMM'/        !EntradaMM
     DATA Variables( 3) /'EntradaQM'/        !EntradaQM
@@ -219,7 +220,13 @@ MODULE Espanol
     DATA Variables(42) /'InicioVacio'/      !InicioVacio
     DATA Variables(43) /'Inicio'/           !Inicio
     DATA Variables(44) /'TrayectoriaMM'/    !TrayectoriaMM
-  CHARACTER(LEN=LLL), DIMENSION(0:40) :: Errores
+    DATA Variables(45) /'Polarizable'/      !Polarizable
+    DATA Variables(46) /'ConvCargasPol'/    !ConvCargasPol
+    DATA Variables(47) /'MaxIterPol'/       !MaxIterPol
+    DATA Variables(48) /'ConvDipolos'/      !ConvDipolos
+    DATA Variables(49) /'DatosPol'/         !DatosPol
+    DATA Variables(50) /'DistDipolos'/      !DistDipolos
+  CHARACTER(LEN=LLL), DIMENSION(0:46) :: Errores
     DATA Errores( 0) /'Error no definido.'/
     DATA Errores( 1) /'La matriz no es simetrica.'/
     DATA Errores( 2) /'Superado el numero maximo de iteraciones.'/
@@ -261,7 +268,13 @@ MODULE Espanol
     DATA Errores(38) /'El MM generico requiere una sola molecula de soluto.'/
     DATA Errores(39) /'Numero incorrecto de atomos en las configuraciones.'/
     DATA Errores(40) /'La primera iteracion no puede ser mayor que el maximo.'/
-  CHARACTER(LEN=LLL), DIMENSION(77) :: Textos
+    DATA Errores(41) /'No se puede usar InicioVacio con Polarizable.'/
+    DATA Errores(42) /'No se puede usar optimizacion con Polarizable.'/
+    DATA Errores(43) /'No convergio el ciclo de polarizacion.'/
+    DATA Errores(44) /'Se alcanzo MaxIter.'/
+    DATA Errores(45) /'Error al leer archivo DatosPol.'/
+    DATA Errores(46) /'DistDipolos debe ser mayor que 0.'/
+  CHARACTER(LEN=LLL), DIMENSION(79) :: Textos
     DATA Textos( 1) /'Maxima componente del gradiente:'/
     DATA Textos( 2) /'Diferencia de energia:'/
     DATA Textos( 3) /'Maxima componente del incremento:'/
@@ -339,6 +352,8 @@ MODULE Espanol
     DATA Textos(75) /'Traslacion'/
     DATA Textos(76) /'Rotacion'/
     DATA Textos(77) /'Cartesiana'/
+    DATA Textos(78) /'Interaccion <q-mu> soluto-disolvente:'/
+    DATA Textos(79) /'Interaccion <q-mu> total:'/
 
 END MODULE Espanol
 
@@ -353,13 +368,13 @@ MODULE English
 
   CHARACTER(LEN=LLL), DIMENSION(6) :: Titulo
     DATA Titulo(1) /'========================================================='/
-    DATA Titulo(2) /'|                    ASEP-MD v. 2.0                     |'/
+    DATA Titulo(2) /'|                    ASEP-MD v. 2.1                     |'/
     DATA Titulo(3) /'|                  ------------------                   |'/
-    DATA Titulo(4) /'| Copyright 2011,2012 I.F.G., M.L.S., A.M.L., M.E.M.,   |'/
-    DATA Titulo(5) /'|                     M.A.A.                            |'/
+    DATA Titulo(4) /'| Copyright 2011,2012,2013,2018 I.F.G., M.L.S., A.M.L., |'/
+    DATA Titulo(5) /'|                               M.E.M., M.A.A.          |'/
     DATA Titulo(6) /'========================================================='/
 
-  CHARACTER(LEN=32), DIMENSION(44) :: Variables
+  CHARACTER(LEN=32), DIMENSION(50) :: Variables
     DATA Variables( 1) /'ChargesType'/     !TipoCargas
     DATA Variables( 2) /'MMInput'/         !EntradaMM
     DATA Variables( 3) /'QMInput'/         !EntradaQM
@@ -404,7 +419,13 @@ MODULE English
     DATA Variables(42) /'VacuumStart'/     !InicioVacio
     DATA Variables(43) /'Start'/           !Inicio
     DATA Variables(44) /'MMTrajectory'/    !TrayectoriaMM
-  CHARACTER(LEN=LLL), DIMENSION(0:40) :: Errores
+    DATA Variables(45) /'Polarizable'/     !Polarizable
+    DATA Variables(46) /'ConvPolCharges'/  !ConvCargasPol
+    DATA Variables(47) /'MaxIterPol'/      !MaxIterPol
+    DATA Variables(48) /'ConvDipoles'/     !ConvDipolos
+    DATA Variables(49) /'PolData'/         !DatosPol
+    DATA Variables(50) /'DipolesDist'/     !DistDipolos
+  CHARACTER(LEN=LLL), DIMENSION(0:46) :: Errores
     DATA Errores( 0) /'Undefined error.'/
     DATA Errores( 1) /'The matrix is not symmetric.'/
     DATA Errores( 2) /'Maximum number of iterations exceeded.'/
@@ -446,7 +467,13 @@ MODULE English
     DATA Errores(38) /'Generic MM requires a single solute molecule.'/
     DATA Errores(39) /'Wrong number of atoms in configurations.'/
     DATA Errores(40) /'The first iteration cannot be larger than the maximum.'/
-  CHARACTER(LEN=LLL), DIMENSION(77) :: Textos
+    DATA Errores(41) /'Cannot use VacuumStart with Polarizable.'/
+    DATA Errores(42) /'Cannot use optimization with Polarizable.'/
+    DATA Errores(43) /'Polarization cycle did not converge.'/
+    DATA Errores(44) /'MaxIter reached.'/
+    DATA Errores(45) /'Error reading PolData file.'/
+    DATA Errores(46) /'DipolesDist must be larger than 0.'/
+  CHARACTER(LEN=LLL), DIMENSION(79) :: Textos
     DATA Textos( 1) /'Maximum component of the gradient:'/
     DATA Textos( 2) /'Energy difference:'/
     DATA Textos( 3) /'Maximum component of the increment:'/
@@ -524,5 +551,7 @@ MODULE English
     DATA Textos(75) /'Translation'/
     DATA Textos(76) /'Rotation'/
     DATA Textos(77) /'Cartesian'/
+    DATA Textos(78) /'Solute-solvent <q-mu> interaction:'/
+    DATA Textos(79) /'Total <q-mu> interaction:'/
   
 END MODULE English

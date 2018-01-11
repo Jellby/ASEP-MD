@@ -30,6 +30,7 @@ PROGRAM prueba
   USE UtilidadesFis
   IMPLICIT NONE
   DOUBLE PRECISION :: Elec,VdW,Eelec,EvdW
+  DOUBLE PRECISION, DIMENSION(2) :: EDip, EQdip
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Esf
   INTEGER :: U,i,Num,Error
 
@@ -81,9 +82,10 @@ PROGRAM prueba
     CALL LeerConfig(Error)
     IF (Error /= 0) EXIT
     CALL EscribirXYZ(U)
-    CALL Interacciones(Elec,VdW)
+    CALL Interacciones(Elec,VdW,EDip)
     Eelec=Eelec+Elec
     EvdW=EvdW+VdW
+    EQdip=EDip
     Num=Num+1
     WRITE(6,101) Elec/KcalmolAtomica,VdW/KcalmolAtomica
   END DO

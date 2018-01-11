@@ -166,7 +166,7 @@ SUBROUTINE CalcularInteracciones(Iter)
   INTEGER, INTENT(IN) :: Iter
   TYPE(Atomo), DIMENSION(3,SIZE(Soluto)) :: Mol
   DOUBLE PRECISION, DIMENSION(3,2) :: Prom
-  DOUBLE PRECISION, DIMENSION(2) :: ELib
+  DOUBLE PRECISION, DIMENSION(2) :: ELib, EDip
   DOUBLE PRECISION :: Elec,VdW,ERef
   INTEGER :: Num,Error
 
@@ -188,20 +188,20 @@ SUBROUTINE CalcularInteracciones(Iter)
     CALL LeerConfig(Error)
     IF (Error /= 0) EXIT
     InterAtom(:,:,:)=IntAt(Iter,:,:,:)
-    CALL Interacciones(Elec,VdW,Mol(2,:))
+    CALL Interacciones(Elec,VdW,EDip,Mol(2,:))
     ERef=Elec+VdW
     Prom(2,1)=Prom(2,1)+Elec
     Prom(2,2)=Prom(2,2)+VdW
     IF (Iter > 0) THEN
       InterAtom(:,:,:)=IntAt(Iter-1,:,:,:)
-      CALL Interacciones(Elec,VdW,Mol(1,:))
+      CALL Interacciones(Elec,VdW,EDip,Mol(1,:))
       Prom(1,1)=Prom(1,1)+Elec
       Prom(1,2)=Prom(1,2)+VdW
       ELib(1)=ELib(1)+EXP(Beta*(ERef-Elec-VdW))
     END IF
     IF (Iter < MaxIter) THEN
       InterAtom(:,:,:)=IntAt(Iter+1,:,:,:)
-      CALL Interacciones(Elec,VdW,Mol(3,:))
+      CALL Interacciones(Elec,VdW,EDip,Mol(3,:))
       Prom(3,1)=Prom(3,1)+Elec
       Prom(3,2)=Prom(3,2)+VdW
       ELib(2)=ELib(2)+EXP(Beta*(ERef-Elec-VdW))

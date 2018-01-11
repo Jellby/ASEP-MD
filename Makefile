@@ -82,9 +82,9 @@ $(COMUN):       Comun.F90
 $(COMUN_MOD): | Comun.F90
 	$(COMP) -c $(firstword $|)
 
-$(CONF):        Configuraciones.F90 cavidad.mod parametros.mod sistema.mod datosqm.mod datosqmmm.mod unidades.mod utilidades.mod
+$(CONF):        Configuraciones.F90 cavidad.mod parametros.mod sistema.mod datosqm.mod datosqmmm.mod unidades.mod utilidades.mod utilidadesfis.mod
 	$(COMP) -c $<
-$(CONF_MOD):  | Configuraciones.F90 cavidad.mod parametros.mod sistema.mod datosqm.mod datosqmmm.mod unidades.mod utilidades.mod
+$(CONF_MOD):  | Configuraciones.F90 cavidad.mod parametros.mod sistema.mod datosqm.mod datosqmmm.mod unidades.mod utilidades.mod utilidadesfis.mod
 	$(COMP) -c $(firstword $|)
 
 $(COORD):       Coordenadas.F90 unidades.mod utilidades.mod tipoatomo.mod
@@ -102,10 +102,10 @@ $(EJEC):       Ejecutar.F90 $(CUANT) genericoqm.mod gaussian.mod molcas.mod gene
 $(EJEC_MOD): | Ejecutar.F90 $(CUANT) genericoqm.mod gaussian.mod molcas.mod genericomm.mod moldy.mod parametros.mod sistema.mod configuraciones.mod utilidades.mod
 	$(COMP) -c $(firstword $|)
 
-$(ENT):       Entrada.F90 $(LANG) utilidades.mod
+$(ENT):     Entrada.F90 $(LANG) utilidades.mod
 	$(COMP) -c $<
-$(ENT_MOD): | Entrada.F90 $(LANG) utilidades.mod
-	$(COMP) -c $(firstword $|)
+$(ENT_MOD): Entrada.F90 | $(LANG) utilidades.mod
+	$(COMP) -c $<
 
 $(GAUSS):       Gaussian.F90 datosqm.mod parametros.mod unidades.mod utilidades.mod utilidadesfis.mod
 	$(COMP) -c $<
@@ -137,9 +137,9 @@ $(MOLDY):       Moldy.F90 configuraciones.mod parametros.mod sistema.mod tipoato
 $(MOLDY_MOD): | Moldy.F90 configuraciones.mod parametros.mod sistema.mod tipoatomo.mod unidades.mod utilidades.mod
 	$(COMP) -c $(firstword $|)
 
-$(OPTIM):       Optimizacion.F90 $(LANG) coordenadas.mod ejecutar.mod parametros.mod tipoatomo.mod unidades.mod utilidades.mod
+$(OPTIM):       Optimizacion.F90 $(LANG) coordenadas.mod ejecutar.mod parametros.mod tipoatomo.mod datosqmmm.mod unidades.mod utilidades.mod
 	$(COMP) -c $<
-$(OPTIM_MOD): | Optimizacion.F90 $(LANG) coordenadas.mod ejecutar.mod parametros.mod tipoatomo.mod unidades.mod utilidades.mod
+$(OPTIM_MOD): | Optimizacion.F90 $(LANG) coordenadas.mod ejecutar.mod parametros.mod tipoatomo.mod datosqmmm.mod unidades.mod utilidades.mod
 	$(COMP) -c $(firstword $|)
 
 $(INTER):       Interseccion.F90 $(LANG) coordenadas.mod ejecutar.mod optimizacion.mod parametros.mod tipoatomo.mod unidades.mod utilidades.mod

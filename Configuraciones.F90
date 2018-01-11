@@ -1,5 +1,5 @@
 !##############################################################################
-!# Copyright 2011,2012,2013 Ignacio Fdez. Galván, M. Luz Sánchez,             #
+!# Copyright 2011,2012,2013,2018 Ignacio Fdez. Galván, M. Luz Sánchez,        #
 !#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
@@ -23,39 +23,46 @@ MODULE Configuraciones
 USE Sistema
 
 !-------------------------------------------------------------------------------
-! Coords:     Coordenadas de todos los átomos
-! CentroMasa: Coordenadas de todos los centros de masas
-! MolSol:     Índices de las moléculas de soluto
-! MolDis:     Índices de las moléculas de disolvente
-! MolDis2:    Índices de las moléculas de disolvente 2
-! DefCelda:   Definición (vectores) de la celda de simulación
-! Krf,Crf:    Constantes para el cálculo con "reaction field"
-! Config:     Número de configuración
-! Centro:     Molécula donde se centra la configuración
-! UConf:      Fichero binario donde se escriben las configuraciones
-! Fuera:      Vector que define para cada átomo si se considera en la config.
-! Fichero:    Variable que indica si el fichero binario está abierto o no
+! Coords:      Coordenadas de todos los átomos
+! CentroMasa:  Coordenadas de todos los centros de masas
+! MolSol:      Índices de las moléculas de soluto
+! MolDis:      Índices de las moléculas de disolvente
+! MolDis2:     Índices de las moléculas de disolvente 2
+! DefCelda:    Definición (vectores) de la celda de simulación
+! Krf,Crf:     Constantes para el cálculo con "reaction field"
+! Config:      Número de configuración
+! Centro:      Molécula donde se centra la configuración
+! UConf:       Fichero binario donde se escriben las configuraciones
+! UDip:        Fichero binario donde se escriben los dipolos
+! Fuera:       Vector que define para cada átomo si se considera en la config.
+! FicheroConf: Variable que indica si el fichero binario está abierto o no
+! FicheroDip:  Variable que indica si el fichero binario de dipolos está abierto
+! GrupoPol:    Grupo al que pertenece cada átomo
+! Dipolos:     Polarizabilidad y dipolo inducido en cada átomo
 !-------------------------------------------------------------------------------
-DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Coords,CentroMasa
+DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Coords,CentroMasa,Dipolos
 DOUBLE PRECISION, DIMENSION(3,3) :: DefCelda
 DOUBLE PRECISION :: Krf,Crf
-INTEGER, DIMENSION(:), ALLOCATABLE :: MolSol,MolDis,MolDis2
-INTEGER :: Config,Centro,UConf
+INTEGER, DIMENSION(:), ALLOCATABLE :: MolSol,MolDis,MolDis2,GrupoPol
+INTEGER :: Config,Centro,UConf,UDip
 LOGICAL, DIMENSION(:), ALLOCATABLE :: Fuera
-LOGICAL :: FicheroConf=.FALSE.
+LOGICAL :: FicheroConf=.FALSE.,FicheroDip=.FALSE.
 
 CONTAINS
 !AbrirUConf
 !CerrarUConf
+!AbrirUDip
+!CerrarUDip
 !LeerConfig(Error)
 !EscribirPDB(Updb)
 !EscribirXYZ(Uxyz,Centros)
-!Interacciones(Elec,VdW,MolCen,GrVdW,HsVdW)
+!Interacciones(Elec,VdW,EDip,MolCen,GrVdW,HsVdW)
 !InteraccionPar(At1,At2,Elec,VdW,QGrad,Grad,QHess,Hess)
 !Promedios(Der,Mol)
 !PotencialMM(Puntos,Potencial)
 !SeleccionarMols(U,NumCargas)
 !ReducirCargas(U,Num,Cargas)
+!Polarizar(Eint)
 
 !-------------------------------------------------------------------------------
 ! Abrir el fichero binario de configuraciones
@@ -87,22 +94,54 @@ SUBROUTINE CerrarUConf
 END SUBROUTINE
 
 !-------------------------------------------------------------------------------
+! Abrir el fichero binario de dipolos
+!-------------------------------------------------------------------------------
+SUBROUTINE AbrirUDip
+  USE Utilidades
+  IMPLICIT NONE
+
+  IF (.NOT. FicheroDip) THEN
+    UDip=NuevaUnidad()
+    OPEN(UDip,STATUS='SCRATCH',FORM='UNFORMATTED')
+    FicheroDip=.TRUE.
+   ELSE
+    REWIND(UDip)
+  END IF
+
+END SUBROUTINE
+
+!-------------------------------------------------------------------------------
+! Cerrar el fichero binario de dipolos
+!-------------------------------------------------------------------------------
+SUBROUTINE CerrarUDip
+  USE Utilidades
+  IMPLICIT NONE
+
+  IF (FicheroDip) CLOSE(UDip)
+  FicheroDip=.FALSE.
+
+END SUBROUTINE
+
+!-------------------------------------------------------------------------------
 ! Lee una configuración del fichero binario
 !-------------------------------------------------------------------------------
-! Error:   Variable para controlar los errores
-! Dist:    Distancia de la molécula al origen
-! Corte:   Radio de corte
-! Num:     Número de átomos
-! NumMol:  Número de moléculas
-! i,j,k:   Contadores
+! Error:    Variable para controlar los errores
+! Dist:     Distancia de la molécula al origen
+! Corte:    Radio de corte
+! Num:      Número de átomos
+! NumMol:   Número de moléculas
+! ErrorDip: Variable para controlar errores al leer dipolos
+! UPol:     Fichero con grupos y polarizabilidades de los átomos
+! i,j,k:    Contadores
 !-------------------------------------------------------------------------------
 SUBROUTINE LeerConfig(Error)
   USE Parametros
+  USE Utilidades
   IMPLICIT NONE
   INTEGER, INTENT(OUT) :: Error
 
   DOUBLE PRECISION :: Dist,Corte
-  INTEGER :: Num,NumMol,i,j,k
+  INTEGER :: Num,NumMol,i,j,k,ErrorDip,UPol
 
   !Se calcula el número de átomos
   Num=0
@@ -135,6 +174,28 @@ SUBROUTINE LeerConfig(Error)
     Corte=HUGE(Corte)
   END IF
   Fuera(:)=.FALSE.
+
+  IF (Polarizable) THEN
+    IF (.NOT. ALLOCATED(GrupoPol)) ALLOCATE(GrupoPol(Num))
+    IF (.NOT. ALLOCATED(Dipolos)) THEN
+      ALLOCATE(Dipolos(Num,4))
+      GrupoPol(:)=0
+      Dipolos(:,:)=0.0D0
+      UPol=NuevaUnidad()
+      OPEN(UPol,FILE=TRIM(DatosPol),STATUS='OLD',ACTION='READ',IOSTAT=ErrorDip)
+      IF (ErrorDip /= 0) CALL Mensaje('LeerConfig',45,.TRUE.)
+      DO i=1,SIZE(Dipolos,1)
+        READ(UPol,*) GrupoPol(i), Dipolos(i,1)
+        IF (ErrorDip /= 0) CALL Mensaje('LeerConfig',45,.TRUE.)
+      END DO
+      CLOSE(UPol)
+    END IF
+    READ(UDip,IOSTAT=ErrorDip) Dipolos(:,:)
+    IF (ErrorDip /= 0) THEN
+      Dipolos(:,2:4)=0.0D0
+      BACKSPACE(UDip)
+    END IF
+  END IF
 
   !Se leen las coordenadas de cada molécula, eliminando las que estén fuera
   !del radio de corte
@@ -380,6 +441,7 @@ END SUBROUTINE EscribirXYZ
 !-------------------------------------------------------------------------------
 ! Elec:    Interacción electrostática
 ! VdW:     Interacción de van der Waals
+! EDip:    Energías de interacción cargas-dipolos inducidos
 ! MolCen:  Molécula central (sustituye a la real de cada configuración)
 ! GrVdW:   Componente de vdW del gradiente
 ! HsVdW:   Componente de vdW de la hessiana
@@ -392,27 +454,31 @@ END SUBROUTINE EscribirXYZ
 ! GradPar: Componente de vdW del gradiente para dos átomos
 ! HessPar: Componente de vdW de la hessiana para dos átomos
 ! Num:     Variable auxiliar para llevar las cuentas de las moléculas
+! Dist,R:  Distancia y vector para interacción con dipolos
 ! i,j,k:   Contadores
 !-------------------------------------------------------------------------------
-SUBROUTINE Interacciones(Elec,VdW,MolCen,GrVdW,HsVdW)
+SUBROUTINE Interacciones(Elec,VdW,EDip,MolCen,GrVdW,HsVdW)
   USE Parametros
   USE Utilidades
+  USE UtilidadesFis
   IMPLICIT NONE
   DOUBLE PRECISION, INTENT(OUT) :: Elec,VdW
+  DOUBLE PRECISION, DIMENSION(2), INTENT(OUT) :: EDip
   TYPE(Atomo), DIMENSION(:), INTENT(IN), OPTIONAL :: MolCen
   DOUBLE PRECISION, DIMENSION(:), INTENT(OUT), OPTIONAL :: GrVdW
   DOUBLE PRECISION, DIMENSION(:,:), INTENT(OUT), OPTIONAL :: HsVdW
 
   TYPE(Atomo), DIMENSION(:), ALLOCATABLE :: Mol
   TYPE(Atomo) :: At1,At2
-  DOUBLE PRECISION :: ElecPar,VdWPar
-  DOUBLE PRECISION, DIMENSION(3) :: GradPar
+  DOUBLE PRECISION :: ElecPar,VdWPar,Dist
+  DOUBLE PRECISION, DIMENSION(3) :: GradPar,R
   DOUBLE PRECISION, DIMENSION(3,3) :: HessPar
   LOGICAL :: QGrad,QHess
   INTEGER :: Num,i,j,k
 
   Elec=0.0D0
   VdW=0.0D0
+  EDip(:)=0.0D0
   IF (PRESENT(GrVdW)) THEN
     GrVdW(:)=0.0D0
     QGrad=.TRUE.
@@ -452,6 +518,10 @@ SUBROUTINE Interacciones(Elec,VdW,MolCen,GrVdW,HsVdW)
                       MoleculasDisolvente2) THEN
     ALLOCATE(Mol(SIZE(Disolvente2,1)))
     Mol(:)=Disolvente2(:)
+  END IF
+
+  IF (Polarizable) THEN
+    CALL Polarizar(EDip(2))
   END IF
 
   !Para cada átomo de la molécula centrada
@@ -525,6 +595,17 @@ SUBROUTINE Interacciones(Elec,VdW,MolCen,GrVdW,HsVdW)
     Num=Num+MoleculasDisolvente2
 !$OMP END SINGLE
 !$OMP END PARALLEL
+    ! Se calcula la interacción con los dipolos inducidos
+    IF (Polarizable) THEN
+      DO i=1,SIZE(Dipolos,1)
+        IF (Dipolos(i,1) == 0.0D0) CYCLE
+        Dist=Distancia(Coords(i,:),At1%pos(:))
+        R=(Coords(i,:)-At1%pos(:))/Dist**3
+        !f=Atenuacion(Dist,Dipolos(i,1))
+        !EDip(1)=EDip(1)-At1%q*DOT_PRODUCT(Dipolos(i,2:4),R)*(4-3*f)*f**3
+        EDip(1)=EDip(1)-At1%q*DOT_PRODUCT(Dipolos(i,2:4),R)
+      END DO
+    END IF
   END DO
 
 END SUBROUTINE Interacciones
@@ -622,6 +703,7 @@ END SUBROUTINE InteraccionPar
 ! Elec:  Energía electrostática temporal
 ! VdW:   Energía de vdW temporal
 ! GVdW:  Gradiente de vdW temporal
+! EDip:  Energías de interacción cargas-dipolos temporales
 ! HVdW:  Hessiana de vdW temporal
 ! Num:   Número de configuraciones
 ! Error: Variable para controlar los errores
@@ -635,6 +717,7 @@ SUBROUTINE Promedios(Der,Mol)
   DOUBLE PRECISION, DIMENSION(:), ALLOCATABLE :: GVdW
   DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: HVdW
   DOUBLE PRECISION :: Elec,VdW
+  DOUBLE PRECISION, DIMENSION(2) :: EDip
   INTEGER :: Num,Error
 
   ! Se inician las variables
@@ -649,36 +732,39 @@ SUBROUTINE Promedios(Der,Mol)
   ! La energía de interacción QM con las cargas es fácil de calcular
   IF (ALLOCATED(DisolvQM)) EnergiaEQM=SUM(DisolvQM(:,4)*DisolvQM(:,5))
   EnergiaEMM=0.0D0
+  EnergiaQDip(:)=0.0D0
   EnergiaVdW=0.0D0
 
   ! Se van leyendo configuraciones y se calculan las interacciones
   Num=0
   CALL AbrirUConf()
+  CALL AbrirUDip()
   DO
     CALL LeerConfig(Error)
     IF (Error /= 0) EXIT
     IF (PRESENT(Mol)) THEN
       SELECT CASE(Der)
        CASE (0)
-        CALL Interacciones(Elec,VdW,Mol)
+        CALL Interacciones(Elec,VdW,EDip,Mol)
        CASE (1)
-        CALL Interacciones(Elec,VdW,Mol,GVdW(:))
+        CALL Interacciones(Elec,VdW,EDip,Mol,GVdW(:))
        CASE (2)
-        CALL Interacciones(Elec,VdW,Mol,GVdW(:),HVdW(:,:))
+        CALL Interacciones(Elec,VdW,EDip,Mol,GVdW(:),HVdW(:,:))
       END SELECT
      ELSE
       SELECT CASE(Der)
        CASE (0)
-        CALL Interacciones(Elec,VdW)
+        CALL Interacciones(Elec,VdW,EDip)
        CASE (1)
-        CALL Interacciones(Elec,VdW,GrVdW=GVdW(:))
+        CALL Interacciones(Elec,VdW,EDip,GrVdW=GVdW(:))
        CASE (2)
-        CALL Interacciones(Elec,VdW,GrVdW=GVdW(:),HsVdW=HVdW(:,:))
+        CALL Interacciones(Elec,VdW,EDip,GrVdW=GVdW(:),HsVdW=HVdW(:,:))
       END SELECT
     END IF
     ! Se acumulan los resultados
     EnergiaEMM=EnergiaEMM+Elec
     EnergiaVdW=EnergiaVdW+VdW
+    EnergiaQDip(:)=EnergiaQDip(:)+EDip(:)
     GradVdW(:)=GradVdW(:)+GVdW(:)
     HessVdW(:,:)=HessVdW(:,:)+HVdW(:,:)
     Num=Num+1
@@ -688,6 +774,7 @@ SUBROUTINE Promedios(Der,Mol)
   IF (Num > 0) THEN
     EnergiaEMM=EnergiaEMM/DBLE(Num)
     EnergiaVdW=EnergiaVdW/DBLE(Num)
+    EnergiaQDip(:)=EnergiaQDip(:)/DBLE(Num)
     GradVdW(:)=GradVdW(:)/DBLE(Num)
     HessVdW(:,:)=HessVdW(:,:)/DBLE(Num)
   END IF
@@ -703,17 +790,20 @@ END SUBROUTINE Promedios
 ! Puntos:    Matriz de puntos donde se ha de calcular el potencial
 ! Potencial: Vector donde se guarda el potencial calculado
 ! Dist:      Distancia entre cada par átomo-punto
+! R:         Vector para interacción con dipolos
 ! Num:       Número de átomos
 ! i,j,k:     Contadores
 !-------------------------------------------------------------------------------
 SUBROUTINE PotencialMM(Puntos,Potencial)
   USE Parametros
   USE Utilidades
+  USE UtilidadesFis
   IMPLICIT NONE
   DOUBLE PRECISION, DIMENSION(:,:), INTENT(IN) :: Puntos
   DOUBLE PRECISION, DIMENSION(SIZE(Puntos,1)), INTENT(OUT) :: Potencial
 
   DOUBLE PRECISION :: Dist
+  DOUBLE PRECISION, DIMENSION(3) :: R
   INTEGER :: Num,i,j,k
 
   !Se calculan las constantes del "reaction field"
@@ -762,6 +852,17 @@ SUBROUTINE PotencialMM(Puntos,Potencial)
       END DO
     END DO
     Num=Num+MoleculasDisolvente2
+    ! Potencial generado por los dipolos inducidos
+    IF (Polarizable) THEN
+      DO i=1,SIZE(Dipolos,1)
+        IF (Dipolos(i,1) == 0.0D0) CYCLE
+        Dist=Distancia(Coords(i,:),Puntos(k,:))
+        R=(Coords(i,:)-Puntos(k,:))/Dist**3
+        !f=Atenuacion(Dist,Dipolos(i,1))
+        !Potencial(k)=Potencial(k)-DOT_PRODUCT(Dipolos(i,2:4),R)*(4-3*f)*f**3
+        Potencial(k)=Potencial(k)-DOT_PRODUCT(Dipolos(i,2:4),R)
+      END DO
+    END IF
   END DO
 !$OMP END PARALLEL DO
 
@@ -775,16 +876,20 @@ END SUBROUTINE PotencialMM
 ! NumCargas: Número acumulativo de cargas escritas en U
 ! Num:       Número de átomos
 ! Aux:       Vector con las coordenadas de un átomo
+! q:         Carga que representa al dipolo inducido
 ! i,j:       Contadores
 !-------------------------------------------------------------------------------
 SUBROUTINE SeleccionarMols(U,NumCargas)
+  USE Parametros
   USE Cavidad
   USE Sistema
+  USE Utilidades
   IMPLICIT NONE
   INTEGER, INTENT(IN) :: U
   INTEGER, INTENT(INOUT) :: NumCargas
 
   DOUBLE PRECISION, DIMENSION(3) :: Aux
+  DOUBLE PRECISION :: q
   INTEGER :: Num,i,j
 
   Num=0
@@ -824,6 +929,20 @@ SUBROUTINE SeleccionarMols(U,NumCargas)
     END DO
   END DO
   Num=Num+MoleculasDisolvente2
+
+  ! Cada dipolo inducido se representa por dos cargas opuestas
+  ! a una distancia fija
+  IF (Polarizable) THEN
+    DO i=1,SIZE(Dipolos,1)
+      IF (Dipolos(i,1) == 0.0D0) CYCLE
+      IF (.NOT. Interior(Coords(i,:))) CYCLE
+      q = Norma(Dipolos(i,2:4))/DistDipolos
+      Aux(:) = Dipolos(i,2:4)*0.5D0/q
+      WRITE(U) Coords(i,:)+Aux(:),q
+      WRITE(U) Coords(i,:)-Aux(:),-q
+      NumCargas=NumCargas+2
+    END DO
+  END IF
 
 END SUBROUTINE SeleccionarMols
 
@@ -1061,5 +1180,152 @@ SUBROUTINE ReducirCargas(U,Num,Cargas)
   END DO
 
 END SUBROUTINE ReducirCargas
+
+!-------------------------------------------------------------------------------
+! Calcula dipolos inducidos para una configuración y devuelve la interacción
+! cargas-dipolos
+!-------------------------------------------------------------------------------
+! Eint:    Interacción cargas-dipolos de la configuración
+! Campo:   Campo eléctrico (permanente y total) en cada punto polarizable
+! R:       Vector distancia
+! Dip:     Nuevo dipolo (para calcular diferencia)
+! Dist:    Distancia
+! D2:      Inverso de la distancia al cuadrado
+! D3:      Inverso de la distancia al cubo
+! mR:      Producto dipolo-distancia
+! Dif:     Máxima diferencia entre dipolos de dos iteraciones
+! f:       Factor de atenuación de dipolos
+! Num:     Número de átomos
+! i,j,k,l: Contadores
+!-------------------------------------------------------------------------------
+SUBROUTINE Polarizar(Eint)
+  USE Parametros
+  USE DatosQM
+  USE Utilidades
+  USE UtilidadesFis
+  IMPLICIT NONE
+  DOUBLE PRECISION, INTENT(OUT) :: Eint
+  DOUBLE PRECISION, DIMENSION(:,:), ALLOCATABLE :: Campo
+  DOUBLE PRECISION, DIMENSION(3) :: R,Dip
+  DOUBLE PRECISION :: Dist,D2,D3,mR,Dif,f
+  INTEGER :: Num,i,j,k,l
+
+  ! Campo
+  ! 1     2     3     4    5    6
+  ! Eq_x, Eq_y, Eq_z, E_x, E_y, E_z
+  ALLOCATE(Campo(SIZE(Dipolos,1),6))
+  Campo(:,:)=0.0D0
+
+  ! Contribución QM: Por el momento se calcula con las cargas ajustadas
+  DO i=1,SIZE(MolQM)
+    DO l=1,SIZE(Dipolos,1)
+      IF (Dipolos(l,1) == 0.0D0) CYCLE
+      Dist=Distancia(Coords(l,:),MolQM(i)%pos(:))
+      R=(Coords(l,:)-MolQM(i)%pos(:))/Dist**3
+      !f=Atenuacion(Dist,Dipolos(l,1))
+      !Campo(l,1:3)=Campo(l,1:3)+MolQM(i)%q*R*(4-3*f)*f**3
+      Campo(l,1:3)=Campo(l,1:3)+MolQM(i)%q*R
+    END DO
+  END DO
+
+  ! Calcula el campo generado por las cargas
+  Num=0
+  DO i=1,MoleculasSoluto
+    IF ((Num+i == Centro) .OR. (MolSol(i) < 0)) CYCLE
+    DO j=1,SIZE(Soluto,1)
+      k=MolSol(i)+j
+      IF (Fuera(k)) CYCLE
+      DO l=1,SIZE(Dipolos,1)
+        IF ((GrupoPol(l) == GrupoPol(k)) .OR. (Dipolos(l,1) == 0.0D0)) CYCLE
+        Dist=Distancia(Coords(l,:),Coords(k,:))
+        R=(Coords(l,:)-Coords(k,:))/Dist**3
+        !f=Atenuacion(Dist,Dipolos(l,1))
+        !Campo(l,1:3)=Campo(l,1:3)+Soluto(j)%q*R*(4-3*f)*f**3
+        Campo(l,1:3)=Campo(l,1:3)+Soluto(j)%q*R
+      END DO
+    END DO
+  END DO
+  Num=Num+MoleculasDisolvente
+  DO i=1,MoleculasDisolvente
+    IF ((Num+i == Centro) .OR. (MolDis(i) < 0)) CYCLE
+    DO j=1,SIZE(Disolvente,1)
+      k=MolDis(i)+j
+      IF (Fuera(k)) CYCLE
+      DO l=1,SIZE(Dipolos,1)
+        IF ((GrupoPol(l) == GrupoPol(k)) .OR. (Dipolos(l,1) == 0.0D0)) CYCLE
+        Dist=Distancia(Coords(l,:),Coords(k,:))
+        R=(Coords(l,:)-Coords(k,:))/Dist**3
+        !f=Atenuacion(Dist,Dipolos(l,1))
+        !Campo(l,1:3)=Campo(l,1:3)+Disolvente(j)%q*R*(4-3*f)*f**3
+        Campo(l,1:3)=Campo(l,1:3)+Disolvente(j)%q*R
+      END DO
+    END DO
+  END DO
+  Num=Num+MoleculasDisolvente
+  DO i=1,MoleculasDisolvente2
+    IF ((Num+i == Centro) .OR. (MolDis2(i) < 0)) CYCLE
+    DO j=1,SIZE(Disolvente2,1)
+      k=MolDis2(i)+j
+      IF (Fuera(k)) CYCLE
+      DO l=1,SIZE(Dipolos,1)
+        IF ((GrupoPol(l) == GrupoPol(k)) .OR. (Dipolos(l,1) == 0.0D0)) CYCLE
+        Dist=Distancia(Coords(l,:),Coords(k,:))
+        R=(Coords(l,:)-Coords(k,:))/Dist**3
+        !f=Atenuacion(Dist,Dipolos(l,1))
+        !Campo(l,1:3)=Campo(l,1:3)+Disolvente2(j)%q*R*(4-3*f)*f**3
+        Campo(l,1:3)=Campo(l,1:3)+Disolvente2(j)%q*R
+      END DO
+    END DO
+  END DO
+  Num=Num+MoleculasDisolvente2
+
+  ! Ciclo de polarización hasta convergencia
+  Dif=HUGE(Dif)
+  k=0
+  DO WHILE (Dif > ConvDipolos)
+    k=k+1
+    IF (k > MaxIterPol) CALL Mensaje('Polarizar',43,.TRUE.)
+    ! Calcula el campo generado por los dipolos inducidos
+    ! (excepto en la primera iteración)
+    IF (Dif < HUGE(Dif)) THEN
+      Campo(:,4:6) = 0.0D0
+      DO i=1,SIZE(Dipolos,1)
+        IF (Dipolos(i,1) == 0.0D0) CYCLE
+        DO j=i+1,SIZE(Dipolos,1)
+          IF (Dipolos(j,1) == 0.0D0) CYCLE
+          Dist=Distancia(Coords(i,:),Coords(j,:))
+          D2=1.0D0/Dist**2
+          D3=1.0D0/Dist**3
+          R=Coords(i,:)-Coords(j,:)
+          f=Atenuacion(Dist,Dipolos(l,1),Dipolos(j,1))
+          mR=DOT_PRODUCT(Dipolos(j,2:4),R)
+          Campo(i,4:6)=Campo(i,4:6)+(3*f*mR*R*D2-(4-3*f)*Dipolos(j,2:4))*D3*f**3
+          mR=DOT_PRODUCT(Dipolos(i,2:4),R)
+          Campo(j,4:6)=Campo(j,4:6)+(3*f*mR*R*D2-(4-3*f)*Dipolos(i,2:4))*D3*f**3
+        END DO
+      END DO
+    END IF
+    ! Calcula el dipolo inducido en cada punto
+    Dif=0.0D0
+    DO i=1,SIZE(Dipolos,1)
+      IF (Dipolos(i,1) == 0.0D0) CYCLE
+      Dip(:)=Dipolos(i,1)*(Campo(i,1:3)+Campo(i,4:6))
+      Dif=MAX(Dif,Distancia(Dipolos(i,2:4),Dip))
+      Dipolos(i,2:4)=Dip(:)
+    END DO
+  END DO
+
+  WRITE(UDip) Dipolos(:,:)
+
+  ! Calcula la interacción cargas-dipolos
+  Eint=0.0D0
+  DO i=1,SIZE(Dipolos,1)
+    IF (Dipolos(i,1) == 0.0D0) CYCLE
+    Eint=Eint-DOT_PRODUCT(Campo(i,1:3),Dipolos(i,2:4))
+  END DO
+
+  DEALLOCATE(Campo)
+
+END SUBROUTINE Polarizar
 
 END MODULE Configuraciones

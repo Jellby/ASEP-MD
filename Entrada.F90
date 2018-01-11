@@ -1,5 +1,5 @@
 !##############################################################################
-!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!# Copyright 2011,2012,2018 Ignacio Fdez. Galván, M. Luz Sánchez,             #
 !#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
@@ -30,15 +30,16 @@ MODULE Parametros
 CHARACTER(LEN=LLL) :: EjecutableMM,EjecutableQM,EntradaMM,EntradaQM,SalidaQM, &
                       FChkGaussian,AltCoordenadas,FicheroCargas,Exten, &
                       Extension,OptContinuacion,CargasExternas,DumpextMoldy, &
-                      SalidaMM,SalidaOpt,TrayectoriaMM
+                      SalidaMM,SalidaOpt,TrayectoriaMM,DatosPol
 INTEGER :: ProgramaMM,ProgramaQM,TipoCargas,TipoCoordenadas,CalcHessiana, &
            Actualizacion,MetodoOptim,MaxIterOpt,HessInicial,BusquedaLineal, &
            Subdivisiones,TipoCavidad,NumConfig,TipoMalla,TipoReduccion, &
-           MaxIter,Inicio
+           MaxIter,Inicio,MaxIterPol
 DOUBLE PRECISION :: ConvGradOpt,ConvEnerOpt,ConvPasoOpt,MaxPasoOpt, &
                     RadioCavidad,RadioDisolvente,Dielectrica,DistMalla, &
-                    FactorMalla,CorteRF,DistCargas
-LOGICAL :: EstadoTransicion,InicioVacio
+                    FactorMalla,CorteRF,DistCargas,ConvCargasPol,ConvDipolos, &
+                    DistDipolos
+LOGICAL :: EstadoTransicion,InicioVacio,Polarizable
 
 END MODULE Parametros
 
@@ -505,6 +506,46 @@ SUBROUTINE LeerVariable(Lin)
     VarEnt(44)=.TRUE.
     TrayectoriaMM=Val
 
+  !Polarizable
+  ELSE IF (TRIM(Var) == TRIM(VarComp(45))) THEN
+    VarEnt(45)=.TRUE.
+    CALL PasarMinusculas(Val)
+    SELECT CASE (TRIM(Val))
+     CASE ('si','yes','1')
+      Polarizable=.TRUE.
+     CASE DEFAULT
+      Polarizable=.FALSE.
+    END SELECT
+
+  !ConvCargasPol
+  ELSE IF (TRIM(Var) == TRIM(VarComp(46))) THEN
+    VarEnt(46)=.TRUE.
+    READ(Val,*) ConvCargasPol
+    IF (ConvCargasPol < 0.0D0) ConvCargasPol=0.0D0
+
+  !MaxIterPol
+  ELSE IF (TRIM(Var) == TRIM(VarComp(47))) THEN
+    VarEnt(47)=.TRUE.
+    READ(Val,*) MaxIterPol
+    IF (MaxIterPol < 0) MaxIterPol=0
+
+  !ConvDipolos
+  ELSE IF (TRIM(Var) == TRIM(VarComp(48))) THEN
+    VarEnt(48)=.TRUE.
+    READ(Val,*) ConvDipolos
+    IF (ConvDipolos < 0.0D0) ConvDipolos=0.0D0
+
+  !DatosPol
+  ELSE IF (TRIM(Var) == TRIM(VarComp(49))) THEN
+    VarEnt(49)=.TRUE.
+    DatosPol=Val
+
+  !DistDipolos
+  ELSE IF (TRIM(Var) == TRIM(VarComp(50))) THEN
+    VarEnt(50)=.TRUE.
+    READ(Val,*) DistDipolos
+    IF (DistDipolos <= 0.0D0) CALL Mensaje('LeerVariable',46,.TRUE.)
+
   !Variable inexistente
   ELSE
     CALL Mensaje('LeerVariable',8,.TRUE.)
@@ -566,6 +607,12 @@ SUBROUTINE ValoresDefecto
   IF (.NOT. VarEnt(42)) InicioVacio=.FALSE.
   IF (.NOT. VarEnt(43)) Inicio=1
   IF (.NOT. VarEnt(44)) TrayectoriaMM='traj.dcd'
+  IF (.NOT. VarEnt(45)) Polarizable=.FALSE.
+  IF (.NOT. VarEnt(46)) ConvCargasPol=1.0D-4
+  IF (.NOT. VarEnt(47)) MaxIterPol=20
+  IF (.NOT. VarEnt(48)) ConvDipolos=1.0D-6
+  IF (.NOT. VarEnt(49)) DatosPol='pol.data'
+  IF (.NOT. VarEnt(50)) DistDipolos=1.0D0
 
   !Algunos valores dependen de otros, pero sólo si no están en la entrada
   IF (EstadoTransicion) THEN
@@ -605,6 +652,11 @@ SUBROUTINE ValoresDefecto
 
   IF ((MaxIter < Inicio) .AND. VarEnt(43)) THEN
     CALL Mensaje('ValoresDefecto',40,.TRUE.)
+  END IF
+
+  IF (Polarizable) THEN
+    IF (InicioVacio) CALL Mensaje('ValoresDefecto',41,.TRUE.)
+    IF (MaxIterOpt > 0) CALL Mensaje('ValoresDefecto',42,.TRUE.)
   END IF
 
 END SUBROUTINE ValoresDefecto
@@ -906,6 +958,37 @@ SUBROUTINE EscribirValores
   WRITE(Valor,103) MaxPasoOpt
   CALL QuitarCeros(Valor)
   WRITE(6,100) Etiqueta, TRIM(Variables(17)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(45)
+  IF (Polarizable) THEN
+    Valor=Textos(41)
+   ELSE
+    Valor=Textos(42)
+  END IF
+  WRITE(6,100) Etiqueta, TRIM(Variables(45)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(49)
+  WRITE(Valor,102) TRIM(DatosPol)
+  WRITE(6,100) Etiqueta, TRIM(Variables(49)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(46)
+  WRITE(Valor,103) ConvCargasPol
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(46)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(47)
+  WRITE(Valor,101) MaxIterPol
+  WRITE(6,100) Etiqueta, TRIM(Variables(47)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(48)
+  WRITE(Valor,103) ConvDipolos
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(48)), TRIM(ADJUSTL(Valor))
+
+  ETIQUETA(50)
+  WRITE(Valor,103) DistDipolos
+  CALL QuitarCeros(Valor)
+  WRITE(6,100) Etiqueta, TRIM(Variables(50)), TRIM(ADJUSTL(Valor))
 
   WRITE(6,*)
   WRITE(6,10)

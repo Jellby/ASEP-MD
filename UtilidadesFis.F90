@@ -1,5 +1,5 @@
 !##############################################################################
-!# Copyright 2011,2012 Ignacio Fdez. Galván, M. Luz Sánchez,                  #
+!# Copyright 2011,2012,2018 Ignacio Fdez. Galván, M. Luz Sánchez,             #
 !#                     Aurora Muñoz Losa, M. Elena Martín, Manuel A. Aguilar  #
 !#                                                                            #
 !# This file is part of ASEP-MD.                                              #
@@ -29,6 +29,7 @@ CONTAINS
 !IgualarCargas(Id,Cargas)
 !PotencialCargas(Cargas,Puntos,Potencial)
 !SuperponerMoleculas(Ref,Mol,Pesos)
+!Atenuacion(Dist,Pol1,Pol2)
 
 !-------------------------------------------------------------------------------
 ! Ajusta los valores de una serie de cargas para reproducir un potencial dado
@@ -473,5 +474,34 @@ SUBROUTINE SuperponerMoleculas(Ref,Mol,Pesos,Trans)
   END IF
 
 END SUBROUTINE SuperponerMoleculas
+
+!-------------------------------------------------------------------------------
+! Calcula el factor de atenuación en la polarización
+!   Ver: Chem. Phys. 59 (1981), 341
+!-------------------------------------------------------------------------------
+! Dist: Distancia entre los dos centros
+! Pol1: Primera polarizabilidad
+! Pol2: Segunda polarizabilidad (opcional)
+!-------------------------------------------------------------------------------
+FUNCTION Atenuacion(Dist,Pol1,Pol2)
+  IMPLICIT NONE
+  DOUBLE PRECISION :: Atenuacion
+  DOUBLE PRECISION, INTENT(IN) :: Dist, Pol1
+  DOUBLE PRECISION, INTENT(IN), OPTIONAL :: Pol2
+
+  DOUBLE PRECISION :: f
+
+  IF (PRESENT(Pol2)) THEN
+    f=3.1407D0*(Pol1*Pol2)**(1.0D0/6)
+  ELSE
+    f=3.1407D0*Pol1**(1.0D0/3)
+  END IF
+  IF (Dist < f) THEN
+    Atenuacion = Dist/f
+  ELSE
+    Atenuacion = 1.0D0
+  END IF
+
+END FUNCTION Atenuacion
 
 END MODULE UtilidadesFis
