@@ -651,7 +651,7 @@ SUBROUTINE ValoresDefecto
   END IF
 
   IF ((MaxIter < Inicio) .AND. VarEnt(43)) THEN
-    CALL Mensaje('ValoresDefecto',40,.TRUE.)
+    IF (.NOT. Polarizable) CALL Mensaje('ValoresDefecto',40,.TRUE.)
   END IF
 
   IF (Polarizable) THEN
