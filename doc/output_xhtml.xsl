@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.w3.org/1999/xhtml">
 
 <xsl:include href="xhtml.xsl"/>
 
@@ -9,7 +9,6 @@
 
 <xsl:template match="document">
   <xsl:element name="html">
-    <xsl:attribute name="xmlns">http://www.w3.org/1999/xhtml</xsl:attribute>
     <xsl:call-template name="head"/>
 
     <xsl:element name="body">
